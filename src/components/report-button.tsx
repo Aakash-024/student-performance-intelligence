@@ -44,9 +44,11 @@ async function loadImage(src: string): Promise<ReportImage | null> {
 
 export function ReportButton({ data }: { data: ReportData }) {
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function download() {
     setBusy(true);
+    setFailed(false);
     try {
       const [leftImage, rightImage] = await Promise.all([
         loadImage(progressReportConfig.logoPath),
@@ -62,6 +64,9 @@ export function ReportButton({ data }: { data: ReportData }) {
 
       const safeName = data.name.replace(/[^a-z0-9]+/gi, "_");
       doc.save(`Progress_Report_${data.registerNumber}_${safeName}.pdf`);
+    } catch (error) {
+      console.error("Progress report generation failed:", error);
+      setFailed(true);
     } finally {
       setBusy(false);
     }
@@ -72,10 +77,13 @@ export function ReportButton({ data }: { data: ReportData }) {
       type="button"
       onClick={download}
       disabled={busy}
-      className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
+      title={failed ? "PDF generation failed — see browser console for details" : undefined}
+      className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium text-white shadow-sm transition disabled:cursor-not-allowed disabled:opacity-70 ${
+        failed ? "bg-rose-600 hover:bg-rose-700" : "bg-indigo-600 hover:bg-indigo-700"
+      }`}
     >
       {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-      {busy ? "Preparing PDF…" : "Download report"}
+      {busy ? "Preparing PDF…" : failed ? "PDF failed — retry" : "Download report"}
     </button>
   );
 }
