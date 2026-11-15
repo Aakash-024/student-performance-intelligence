@@ -17,6 +17,8 @@ export const progressReportConfig: ProgressReportConfig = {
   // this to "/college-emblem.png" to show it on the right of the header.
   emblemPath: "",
   degree: "B.TECH",
+  departmentName: "Artificial Intelligence and Data Science",
+  departmentCode: "AI & DS",
   assessmentTitle: "CONTINUOUS ASSESSMENT TEST - I",
   assessmentShort: "CAT-I",
   passThresholdPercent: 50,

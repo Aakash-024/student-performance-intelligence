@@ -55,6 +55,10 @@ export interface ProgressReportConfig {
   /** Path under /public for the right emblem. Empty string leaves the slot empty. */
   emblemPath: string;
   degree: string;
+  /** When set, overrides the department name from the database on the PDF. */
+  departmentName?: string;
+  /** When set, overrides the department code (course, HOD line, section). */
+  departmentCode?: string;
   assessmentTitle: string;
   assessmentShort: string;
   passThresholdPercent: number;
@@ -152,6 +156,12 @@ export async function buildProgressReportDoc(
   const H = doc.internal.pageSize.getHeight();
   const M = 36;
   const contentW = W - M * 2;
+
+  // Config overrides win over database-derived values so the letterhead can
+  // be fixed in report-config.ts without touching the seed data.
+  const departmentName = config.departmentName || data.departmentName;
+  const departmentCode = config.departmentCode || data.departmentCode;
+  const course = `${config.degree} (${departmentCode})`;
   const lastY = () => (doc as unknown as LastAutoTable).lastAutoTable.finalY;
 
   const baseStyles = {
@@ -181,7 +191,7 @@ export async function buildProgressReportDoc(
   doc.setFontSize(8.5);
   doc.text(config.collegeAddress, W / 2, 83, { align: "center" });
   doc.setFontSize(9.5);
-  doc.text(`DEPARTMENT OF ${data.departmentName.toUpperCase()}`, W / 2, 96, { align: "center" });
+  doc.text(`DEPARTMENT OF ${departmentName.toUpperCase()}`, W / 2, 96, { align: "center" });
 
   drawImageSlot(doc, logos.left, M, 42, 54, 54);
   drawImageSlot(doc, logos.right, W - M - 48, 42, 48, 54);
@@ -215,7 +225,7 @@ export async function buildProgressReportDoc(
       ["Academic Year :", data.academicYear, "Reg. No. :", data.registerNumber],
       [
         "Course :",
-        data.course,
+        course,
         "Semester / Section :",
         `${romanNumeral(data.semester)} / ${data.section}`,
       ],
@@ -318,7 +328,7 @@ export async function buildProgressReportDoc(
     `Year Coordinator :  ${config.yearCoordinator}`,
     "",
     "",
-    `HOD / ${data.departmentCode} :  ${config.hod}`,
+    `HOD / ${departmentCode} :  ${config.hod}`,
   ].join("\n");
   autoTable(doc, {
     startY: lastY() + 26,
@@ -362,7 +372,7 @@ export async function buildProgressReportDoc(
     },
     body: [
       ["Name of the Student", data.name, "Date :", data.reportDate],
-      ["Branch", data.course, "Reg. No. :", data.registerNumber],
+      ["Branch", course, "Reg. No. :", data.registerNumber],
       ["Parents' Remarks", "", "Semester :", `${romanNumeral(data.semester)} / ${data.section}`],
       [
         "Signature",

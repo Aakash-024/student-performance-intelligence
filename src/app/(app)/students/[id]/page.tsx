@@ -16,6 +16,7 @@ import { formatDate, formatPercent, indicatorMeta, termLabel } from "@/lib/utils
 import { Card, IndicatorBadge, PageHeader, ProgressBar, StatCard } from "@/components/ui";
 import { AssessmentTrendChart, SubjectRadarChart } from "@/components/charts";
 import { ReportButton } from "@/components/report-button";
+import { progressReportConfig } from "@/lib/report-config";
 import { EditStudentForm } from "../student-form";
 
 export const metadata = { title: "Student" };
@@ -96,7 +97,8 @@ export default async function StudentDetailPage({
   // ---- Progress-report PDF data ---------------------------------------------
   const sectionInfo = sections.find((section) => section.id === student.section_id);
   const department = departments.find((dept) => dept.id === sectionInfo?.department_id);
-  const departmentCode = department?.code ?? "—";
+  const departmentCode = progressReportConfig.departmentCode || department?.code || "—";
+  const departmentName = progressReportConfig.departmentName || department?.name || "—";
 
   const cat1BySubject = new Map(
     marks
@@ -113,7 +115,7 @@ export default async function StudentDetailPage({
     registerNumber: student.register_number,
     year: student.current_year,
     section: departmentCode === "—" ? (student.sections?.name ?? "—") : `${departmentCode}-${student.sections?.name ?? "—"}`,
-    departmentName: department?.name ?? "—",
+    departmentName,
     departmentCode,
     course: `B.TECH (${departmentCode})`,
     semester: currentTerm?.semester ?? 1,
