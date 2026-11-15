@@ -320,7 +320,6 @@ export async function buildProgressReportDoc(
     "",
     `HOD / ${data.departmentCode} :  ${config.hod}`,
   ].join("\n");
-
   autoTable(doc, {
     startY: lastY() + 26,
     margin,
@@ -377,11 +376,14 @@ export async function buildProgressReportDoc(
   doc.setFontSize(8.5);
   doc.setTextColor(40, 40, 40);
   const footerY = Math.max(lastY() + 18, H - 52);
-  doc.text(
-    `Please return to : ${config.classAdvisor}, The Class Advisor, ${romanNumeral(data.year)} Year ${data.section}`,
-    M,
-    footerY,
-  );
+  const returnTo = [
+    config.classAdvisor,
+    "The Class Advisor",
+    `${romanNumeral(data.year)} Year ${data.section}`,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  doc.text(`Please return to : ${returnTo}`, M, footerY);
   doc.text("Note : Please return the form duly filled and signed for further review to HOD.", M, footerY + 12);
   doc.setTextColor(20, 20, 20);
 

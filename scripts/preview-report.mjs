@@ -13,10 +13,10 @@ const config = {
   assessmentTitle: "CONTINUOUS ASSESSMENT TEST - I",
   assessmentShort: "CAT-I",
   passThresholdPercent: 50,
-  classAdvisor: "Ms. Abarana",
-  classCoAdvisor: "Ms. A. Jeno Kalaiselvi Saliya",
-  yearCoordinator: "Mr. B. Yogesh Kumar",
-  hod: "Dr. B. Muthusenthil",
+  classAdvisor: "",
+  classCoAdvisor: "",
+  yearCoordinator: "",
+  hod: "",
 };
 
 const data = {

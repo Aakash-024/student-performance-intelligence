@@ -20,8 +20,10 @@ export const progressReportConfig: ProgressReportConfig = {
   assessmentTitle: "CONTINUOUS ASSESSMENT TEST - I",
   assessmentShort: "CAT-I",
   passThresholdPercent: 50,
-  classAdvisor: "Ms. Abarana",
-  classCoAdvisor: "Ms. A. Jeno Kalaiselvi Saliya",
-  yearCoordinator: "Mr. B. Yogesh Kumar",
-  hod: "Dr. B. Muthusenthil",
+  // Signatory names are left blank — they change per student/section and are
+  // filled in by hand. Set any of these to a name to have it printed instead.
+  classAdvisor: "",
+  classCoAdvisor: "",
+  yearCoordinator: "",
+  hod: "",
 };
