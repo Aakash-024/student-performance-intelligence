@@ -4,12 +4,14 @@ import { ArrowLeft, CalendarCheck, GraduationCap, Mail, TrendingDown, TrendingUp
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import {
+  getDepartments,
   getSections,
   getStudentDetail,
   getStudentOverview,
   getSubjects,
   getTerms,
 } from "@/lib/data";
+import { formatDotDate, toAcademicYear } from "@/lib/progress-report";
 import { formatDate, formatPercent, indicatorMeta, termLabel } from "@/lib/utils";
 import { Card, IndicatorBadge, PageHeader, ProgressBar, StatCard } from "@/components/ui";
 import { AssessmentTrendChart, SubjectRadarChart } from "@/components/charts";
@@ -30,11 +32,12 @@ export default async function StudentDetailPage({
   const detail = await getStudentDetail(supabase, id);
   if (!detail) notFound();
 
-  const [terms, subjects, sectionPeers, sections] = await Promise.all([
+  const [terms, subjects, sectionPeers, sections, departments] = await Promise.all([
     getTerms(supabase),
     getSubjects(supabase),
     getStudentOverview(supabase),
     getSections(supabase),
+    getDepartments(supabase),
   ]);
 
   const { student, overview, subjectPerformance, attendance, marks } = detail;
@@ -90,29 +93,46 @@ export default async function StudentDetailPage({
       .sort((a, b) => b.avg_percentage - a.avg_percentage)
       .findIndex((row) => row.student_id === id) + 1;
 
+  // ---- Progress-report PDF data ---------------------------------------------
+  const sectionInfo = sections.find((section) => section.id === student.section_id);
+  const department = departments.find((dept) => dept.id === sectionInfo?.department_id);
+  const departmentCode = department?.code ?? "—";
+
+  const cat1BySubject = new Map(
+    marks
+      .filter(
+        (mark) =>
+          mark.assessments?.type === "cat1" &&
+          mark.assessments.academic_terms?.name === currentTerm?.name,
+      )
+      .map((mark) => [mark.assessments!.subject_id, mark]),
+  );
+
   const reportData = {
     name: student.name,
     registerNumber: student.register_number,
-    email: student.email,
-    section: student.sections?.name ?? "—",
     year: student.current_year,
-    indicator: overview?.indicator ?? ("on_track" as const),
-    average: overview?.avg_percentage ?? 0,
-    attendance: overview?.attendance_percentage ?? 0,
-    previousAverage: overview?.previous_percentage ?? null,
-    change: overview?.change ?? 0,
-    subjectsPassed: overview?.subjects_passed ?? 0,
-    subjectsCount: overview?.subjects_count ?? 0,
-    rank: Math.max(rank, 1),
-    cohort: sameSection.length,
-    term: currentTerm?.name ?? "Current term",
-    subjects: currentSubjects.map((row) => ({
-      code: subjectById.get(row.subject_id)?.code ?? "—",
-      name: subjectById.get(row.subject_id)?.name ?? "Subject",
-      current: row.percentage,
-      previous: previousSubjects.get(row.subject_id) ?? null,
-    })),
-    attendanceByTerm: attendanceRows,
+    section: departmentCode === "—" ? (student.sections?.name ?? "—") : `${departmentCode}-${student.sections?.name ?? "—"}`,
+    departmentName: department?.name ?? "—",
+    departmentCode,
+    course: `B.TECH (${departmentCode})`,
+    semester: currentTerm?.semester ?? 1,
+    academicYear: currentTerm ? toAcademicYear(currentTerm.year) : "—",
+    attendancePercent: overview?.attendance_percentage ?? 0,
+    attendanceFrom: formatDotDate(currentTerm?.start_date),
+    attendanceTo: formatDotDate(currentTerm?.end_date),
+    subjects: currentSubjects.map((row) => {
+      const subject = subjectById.get(row.subject_id);
+      const mark = cat1BySubject.get(row.subject_id);
+      return {
+        code: subject?.code ?? "—",
+        name: subject?.name ?? "Subject",
+        marks: mark && !mark.is_absent ? Number(mark.marks_obtained) : null,
+        maxMarks: mark?.assessments?.max_marks ?? 0,
+        absent: mark?.is_absent ?? false,
+      };
+    }),
+    reportDate: formatDotDate(new Date().toISOString().slice(0, 10)),
   };
 
   return (
