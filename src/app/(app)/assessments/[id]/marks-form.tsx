@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Save } from "lucide-react";
 import { saveMarks, type FormState } from "../actions";
+import { useRefreshOnSuccess } from "@/components/use-refresh-on-success";
 
 const initial: FormState = {};
 
@@ -84,6 +85,7 @@ export function MarksForm({
   editable: boolean;
 }) {
   const [state, action, pending] = useActionState(saveMarks, initial);
+  useRefreshOnSuccess(state);
 
   return (
     <form action={action}>

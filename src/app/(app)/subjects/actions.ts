@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -50,7 +49,7 @@ export async function createSubject(
     return { error: error.message };
   }
 
-  redirect(`/subjects?flash=${encodeURIComponent(`${code} — ${name} created.`)}`);
+  return { success: `${code} — ${name} created.` };
 }
 
 export async function updateSubject(
@@ -78,5 +77,5 @@ export async function updateSubject(
 
   if (error) return { error: error.message };
 
-  redirect(`/subjects?flash=${encodeURIComponent("Subject updated.")}`);
+  return { success: "Subject updated." };
 }

@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Plus, Save } from "lucide-react";
 import { createSubject, updateSubject, type FormState } from "./actions";
+import { useRefreshOnSuccess } from "@/components/use-refresh-on-success";
 import type { Department, Subject } from "@/lib/types";
 
 const initial: FormState = {};
@@ -27,6 +28,7 @@ function Feedback({ state }: { state: FormState }) {
 
 export function CreateSubjectForm({ departments }: { departments: Department[] }) {
   const [state, action, pending] = useActionState(createSubject, initial);
+  useRefreshOnSuccess(state);
 
   return (
     <details className="group rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -121,6 +123,7 @@ export function CreateSubjectForm({ departments }: { departments: Department[] }
 
 export function EditSubjectForm({ subject }: { subject: Subject }) {
   const [state, action, pending] = useActionState(updateSubject, initial);
+  useRefreshOnSuccess(state);
 
   return (
     <details className="rounded-xl border border-slate-200 bg-slate-50/60">

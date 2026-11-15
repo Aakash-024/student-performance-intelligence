@@ -1,12 +1,13 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
   error?: string;
   success?: string;
+  /** Set by createSession so the client can navigate to the new session. */
+  sessionId?: string;
 }
 
 export async function createSession(
@@ -55,9 +56,7 @@ export async function createSession(
     return { error: error.message };
   }
 
-  redirect(
-    `/attendance/${data.id}?flash=${encodeURIComponent("Session created — record attendance below.")}`,
-  );
+  return { success: "Session created.", sessionId: data.id };
 }
 
 export async function saveAttendance(
@@ -116,9 +115,8 @@ export async function saveAttendance(
     return { error: error.message };
   }
 
-  redirect(
-    `/attendance/${sessionId}?flash=${encodeURIComponent(
-      `Saved attendance for ${rows.length} students · ${present.size} present, ${rows.length - present.size} absent.`,
-    )}`,
-  );
+  // NOTE: small state object + client refresh (see assessments/actions.ts note).
+  return {
+    success: `Saved attendance for ${rows.length} students · ${present.size} present, ${rows.length - present.size} absent.`,
+  };
 }

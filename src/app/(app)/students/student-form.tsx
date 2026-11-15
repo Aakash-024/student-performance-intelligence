@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Plus, Save, UserPlus } from "lucide-react";
 import { createStudent, updateStudent, type FormState } from "./actions";
+import { useRefreshOnSuccess } from "@/components/use-refresh-on-success";
 import type { Section } from "@/lib/types";
 
 const initial: FormState = {};
@@ -27,6 +28,7 @@ function Feedback({ state }: { state: FormState }) {
 
 export function CreateStudentForm({ sections }: { sections: Section[] }) {
   const [state, action, pending] = useActionState(createStudent, initial);
+  useRefreshOnSuccess(state);
 
   return (
     <details className="rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -131,6 +133,7 @@ export function EditStudentForm({
   sections: Section[];
 }) {
   const [state, action, pending] = useActionState(updateStudent, initial);
+  useRefreshOnSuccess(state);
 
   return (
     <details className="rounded-xl border border-slate-200 bg-slate-50/60">

@@ -2,7 +2,9 @@
 
 import { useActionState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Plus, Trash2, UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { addAssignment, createTeacher, removeAssignment, type FormState } from "./actions";
+import { useRefreshOnSuccess } from "@/components/use-refresh-on-success";
 import type { AcademicTerm, Department, Section, Subject } from "@/lib/types";
 
 const initial: FormState = {};
@@ -27,6 +29,7 @@ function Feedback({ state }: { state: FormState }) {
 
 export function CreateTeacherForm({ departments }: { departments: Department[] }) {
   const [state, action, pending] = useActionState(createTeacher, initial);
+  useRefreshOnSuccess(state);
 
   return (
     <details className="rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -126,6 +129,7 @@ export function AssignClassForm({
   terms: AcademicTerm[];
 }) {
   const [state, action, pending] = useActionState(addAssignment, initial);
+  useRefreshOnSuccess(state);
   const current = terms.find((term) => term.is_current) ?? terms[terms.length - 1];
 
   return (
@@ -181,8 +185,16 @@ export function AssignClassForm({
 }
 
 export function RemoveAssignmentButton({ id }: { id: string }) {
+  const router = useRouter();
+
+  // Plain (stateless) action; refresh explicitly so the chip disappears.
+  async function handleRemove(formData: FormData) {
+    await removeAssignment(formData);
+    router.refresh();
+  }
+
   return (
-    <form action={removeAssignment}>
+    <form action={handleRemove}>
       <input type="hidden" name="id" value={id} />
       <button
         type="submit"

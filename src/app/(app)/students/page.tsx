@@ -5,7 +5,7 @@ import { getSections, getStudentOverview, getTeacherContext } from "@/lib/data";
 import { requireUser } from "@/lib/auth";
 import type { Indicator } from "@/lib/types";
 import { formatPercent, INDICATOR_ORDER, indicatorMeta } from "@/lib/utils";
-import { Card, EmptyState, Flash, IndicatorBadge, PageHeader, ProgressBar } from "@/components/ui";
+import { Card, EmptyState, IndicatorBadge, PageHeader, ProgressBar } from "@/components/ui";
 import { CreateStudentForm } from "./student-form";
 
 export const metadata = { title: "Students" };
@@ -13,7 +13,7 @@ export const metadata = { title: "Students" };
 export default async function StudentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; section?: string; indicator?: string; flash?: string }>;
+  searchParams: Promise<{ q?: string; section?: string; indicator?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
@@ -48,8 +48,6 @@ export default async function StudentsPage({
         title="Students"
         description="Every active student with current-term performance, attendance, and early-warning status."
       />
-
-      <Flash message={params.flash} />
 
       {isAdmin ? (
         <div className="mb-5">

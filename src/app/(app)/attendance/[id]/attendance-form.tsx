@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Save } from "lucide-react";
 import { saveAttendance, type FormState } from "../actions";
+import { useRefreshOnSuccess } from "@/components/use-refresh-on-success";
 
 const initial: FormState = {};
 
@@ -24,6 +25,7 @@ export function AttendanceForm({
   editable: boolean;
 }) {
   const [state, action, pending] = useActionState(saveAttendance, initial);
+  useRefreshOnSuccess(state);
   const [present, setPresent] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(
       students.map((student) => [

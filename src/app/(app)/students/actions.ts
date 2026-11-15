@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -97,9 +96,8 @@ export async function createStudent(
     }
   }
 
-  redirect(
-    `/students?flash=${encodeURIComponent(`${name} (${registerNumber}) added and enrolled in the current term.`)}`,
-  );
+  // Small state + client refresh; see assessments/actions.ts for why not redirect.
+  return { success: `${name} (${registerNumber}) added and enrolled in the current term.` };
 }
 
 export async function updateStudent(
@@ -142,5 +140,5 @@ export async function updateStudent(
 
   if (error) return { error: error.message };
 
-  redirect(`/students/${id}?flash=${encodeURIComponent("Student record updated.")}`);
+  return { success: "Student record updated." };
 }

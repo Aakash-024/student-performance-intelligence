@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { AlertCircle, Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { createSession, type FormState } from "./actions";
 import type { AcademicTerm, Section, Subject, TeacherAssignment } from "@/lib/types";
 
@@ -21,7 +22,15 @@ export function CreateSessionForm({
   isAdmin: boolean;
 }) {
   const [state, action, pending] = useActionState(createSession, initial);
+  const router = useRouter();
   const current = terms.find((term) => term.is_current) ?? terms[terms.length - 1];
+
+  // Navigate to the new session with a normal client navigation (a plain RSC
+  // GET, which is reliable on production) instead of a redirect inside the
+  // action, whose large response can hang (vercel/next.js#95714).
+  useEffect(() => {
+    if (state.success && state.sessionId) router.push(`/attendance/${state.sessionId}`);
+  }, [state, router]);
 
   const allowedSubjectIds = isAdmin
     ? null

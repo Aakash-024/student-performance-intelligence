@@ -10,7 +10,7 @@ import {
   getTerms,
 } from "@/lib/data";
 import { formatDate, formatPercent, termLabel } from "@/lib/utils";
-import { Card, EmptyState, Flash, PageHeader, ProgressBar, StatCard } from "@/components/ui";
+import { Card, EmptyState, PageHeader, ProgressBar, StatCard } from "@/components/ui";
 import { CreateSessionForm } from "./session-form";
 
 export const metadata = { title: "Attendance" };
@@ -18,7 +18,7 @@ export const metadata = { title: "Attendance" };
 export default async function AttendancePage({
   searchParams,
 }: {
-  searchParams: Promise<{ subject?: string; section?: string; term?: string; flash?: string }>;
+  searchParams: Promise<{ subject?: string; section?: string; term?: string }>;
 }) {
   const params = await searchParams;
   const { user, profile } = await requireUser();
@@ -64,8 +64,6 @@ export default async function AttendancePage({
         title="Attendance"
         description="Create class sessions and record present or absent students."
       />
-
-      <Flash message={params.flash} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Sessions" value={visible.length} hint={`${currentTerm?.name ?? "Current term"}`} icon={CalendarDays} tone="indigo" />

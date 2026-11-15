@@ -2,7 +2,9 @@
 
 import { useActionState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { createAssessment, deleteAssessment, updateAssessment, type FormState } from "./actions";
+import { useRefreshOnSuccess } from "@/components/use-refresh-on-success";
 import type { AcademicTerm, Assessment, Subject } from "@/lib/types";
 
 const initial: FormState = {};
@@ -33,6 +35,7 @@ export function CreateAssessmentForm({
   terms: AcademicTerm[];
 }) {
   const [state, action, pending] = useActionState(createAssessment, initial);
+  useRefreshOnSuccess(state);
   const current = terms.find((term) => term.is_current) ?? terms[terms.length - 1];
 
   return (
@@ -145,6 +148,14 @@ export function CreateAssessmentForm({
 
 export function EditAssessmentForm({ assessment }: { assessment: Assessment }) {
   const [state, action, pending] = useActionState(updateAssessment, initial);
+  useRefreshOnSuccess(state);
+  const router = useRouter();
+
+  // Deleting returns no state; refresh explicitly so the list drops the row.
+  async function handleDelete(formData: FormData) {
+    await deleteAssessment(formData);
+    router.refresh();
+  }
 
   return (
     <details className="rounded-xl border border-slate-200 bg-slate-50/60">
@@ -197,11 +208,7 @@ export function EditAssessmentForm({ assessment }: { assessment: Assessment }) {
           Save
         </button>
 
-        <button
-          formAction={deleteAssessment}
-          formNoValidate
-          className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-medium text-rose-600 transition hover:bg-rose-50"
-        >
+        <button formAction={handleDelete} formNoValidate className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-medium text-rose-600 transition hover:bg-rose-50">
           <Trash2 className="h-3.5 w-3.5" /> Delete assessment
         </button>
       </form>

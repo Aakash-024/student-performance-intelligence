@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { requireAdmin, requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -46,7 +45,7 @@ export async function createAssessment(
     return { error: error.message };
   }
 
-  redirect(`/assessments?flash=${encodeURIComponent("Assessment created.")}`);
+  return { success: "Assessment created." };
 }
 
 export async function updateAssessment(
@@ -72,7 +71,7 @@ export async function updateAssessment(
 
   if (error) return { error: error.message };
 
-  redirect(`/assessments?flash=${encodeURIComponent("Assessment updated.")}`);
+  return { success: "Assessment updated." };
 }
 
 export async function deleteAssessment(formData: FormData) {
@@ -82,7 +81,6 @@ export async function deleteAssessment(formData: FormData) {
 
   const supabase = await createClient();
   await supabase.from("assessments").delete().eq("id", id);
-  redirect(`/assessments?flash=${encodeURIComponent("Assessment deleted.")}`);
 }
 
 export async function saveMarks(
@@ -154,9 +152,9 @@ export async function saveMarks(
     return { error: error.message };
   }
 
-  redirect(
-    `/assessments/${assessmentId}?flash=${encodeURIComponent(
-      `Saved ${entries.length} mark${entries.length === 1 ? "" : "s"} as ${profile?.full_name ?? "user"}.`,
-    )}`,
-  );
+  // NOTE: return a small state object and let the client refresh.
+  // On production builds, action responses that carry revalidatePath re-renders
+  // (or a redirect to a large page) can hang open (vercel/next.js#95714):
+  // the write commits but useActionState stays pending forever.
+  return { success: `Saved ${entries.length} mark${entries.length === 1 ? "" : "s"} as ${profile?.full_name ?? "user"}.` };
 }
