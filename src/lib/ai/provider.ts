@@ -61,7 +61,10 @@ export async function chatComplete(options: ChatOptions) {
         model: model(),
         messages: options.messages,
         temperature: options.temperature ?? 0.3,
-        max_tokens: options.maxTokens ?? 1200,
+        // gpt-oss models spend tokens on hidden reasoning before the visible
+        // answer, so the cap must leave room for both or JSON gets truncated.
+        max_tokens: options.maxTokens ?? 4096,
+        reasoning_effort: process.env.GROQ_REASONING_EFFORT || "low",
         stream: false,
       }),
       signal: AbortSignal.timeout(60_000),
