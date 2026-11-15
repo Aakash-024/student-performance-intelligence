@@ -241,6 +241,13 @@ npm run build
   user and RLS. This keeps the App Router behaviour predictable.
 - Session refresh lives in `src/proxy.ts` (Next.js 16 renamed middleware to proxy).
 - PDF generation is client-side, so it works on serverless hosting without writing to disk.
+- **Server actions return small state objects, and forms call `router.refresh()` after success.**
+  On production builds, action responses that carry a `revalidatePath` re-render (or a redirect to
+  a large page) can hang open (vercel/next.js#95714): the write commits, but `useActionState`
+  stays pending forever. Small responses close reliably, the refresh is a normal RSC GET, and
+  every page renders dynamically so the refreshed tree is live data. This was verified against
+  the production deployment; `createSession` returns the new session id and the client navigates
+  with `router.push`.
 
 ---
 
@@ -275,6 +282,7 @@ This was tested against the live project, not just the UI.
 | Login returns 500                         | Ensure auth users were created with a password and have complete token columns (GoTrue) |
 | Teacher cannot save marks                 | Check `teacher_assignments` for that teacher/subject/section/term                       |
 | PDF download blocked                      | Allow downloads for the site; reports are generated in the browser                      |
+| Buttons stuck on "Saving…" after a deploy | Reload the page — the open tab still runs the previous deployment's JS and action IDs   |
 
 ---
 
