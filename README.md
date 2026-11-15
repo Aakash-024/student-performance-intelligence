@@ -77,6 +77,26 @@ lists — all filtered by role.
 Per-student report with identity, section, term, subject-wise marks, attendance, overall average,
 class rank and the indicator explanation. Generated in the browser with jsPDF + autotable.
 
+### AI insights (V2, in progress)
+
+Phase 4 of the project plan introduces advisory AI agents on top of the platform data:
+
+- **Student Risk Analysis Agent** (built): explains a student's rule-based indicator from their
+  actual marks, attendance and term-over-term numbers, lists contributing factors with severity,
+  and suggests focus areas. Rendered as an "AI insight" panel on the student detail page.
+- Planned: performance analyst, personalized recommendations, teacher assistant and automated
+  report summary agents.
+
+How it stays safe:
+
+- The evidence pack is fetched with the **signed-in user's** Supabase client, so Row Level
+  Security decides exactly what the agent can see — the agent has no data access of its own.
+- Agents are **advisory only**: they write nothing to academic tables. The only write is an audit
+  row in `ai_insights` recording who ran which agent.
+- Every conclusion must cite the figures it is based on; the model is instructed never to invent
+  numbers, and the UI shows the evidence list.
+- The GLM API key is server-only (`ZAI_API_KEY`); it never reaches the browser.
+
 ---
 
 ## Architecture
@@ -99,6 +119,7 @@ src/
     supabase/              browser, server (cookie-aware), admin clients
     auth.ts                requireUser / requireAdmin
     data.ts                typed read helpers
+    ai/                    V2 agent layer (provider, prompts, context, agents, audit)
     types.ts, utils.ts     shared types and formatting
   proxy.ts                 refreshes the Supabase session on every request
 
@@ -108,6 +129,7 @@ supabase/migrations/
   003_teacher_assignments.sql  teacher ↔ subject/section/term mapping + write policies
   004_analytics_views.sql  security-invoker analytics views
   005_assessment_summary.sql   per-assessment coverage/average view
+  006_ai_insights.sql      append-only audit log for V2 AI agent runs
 
 data/
   generate_data.py         deterministic synthetic data generator
@@ -152,6 +174,9 @@ SUPABASE_SECRET_KEY=sb_secret_...
 - `NEXT_PUBLIC_*` values are visible in the browser. Only put the publishable key there.
 - `SUPABASE_SECRET_KEY` is server-only. It is used by teacher creation and the seed script. Never
   expose it to the client.
+- `ZAI_API_KEY` (optional, V2 AI agents) is server-only. Get a key from Z.ai; without it the AI
+  panels explain that AI is not configured instead of failing silently. `ZAI_MODEL` optionally
+  overrides the GLM model (default `glm-4.6`).
 
 ### 4. Create the database
 
@@ -163,6 +188,7 @@ Run the migrations in order in the Supabase SQL editor (or with the Supabase CLI
 003_teacher_assignments.sql
 004_analytics_views.sql
 005_assessment_summary.sql
+006_ai_insights.sql
 ```
 
 ### 5. Create users and demo accounts
@@ -288,7 +314,9 @@ This was tested against the live project, not just the UI.
 
 ## Roadmap (V2)
 
-- Optional AI/ML risk prediction on top of the existing rule-based indicators.
+- AI/ML risk prediction and advisory agents — **Phase 4 in progress** on
+  `feature/v2-ai-agents` (Risk Analysis Agent built; analyst, recommendations,
+  teacher assistant and report summary agents to follow).
 - CSV import for real institutional data.
 - Email/notification workflows for at-risk students.
 - Audit log for mark corrections.
