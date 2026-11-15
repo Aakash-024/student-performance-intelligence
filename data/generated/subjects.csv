@@ -1,0 +1,6 @@
+id,code,name,department_id,credits,type
+74f45dd0-9554-52c7-9a80-69bc8ea37c74,CS201,Data Structures and Algorithms,5c6be14e-c07c-5765-b70b-00d8b59281cc,4,theory
+84e2239d-f97a-5f2e-8677-a3b9344c5521,CS202,Object Oriented Programming,5c6be14e-c07c-5765-b70b-00d8b59281cc,4,theory
+25424ec1-9a9f-5074-8d17-1a011ac18334,CS203,Database Management Systems,5c6be14e-c07c-5765-b70b-00d8b59281cc,3,theory
+5d6154c6-0f3a-5b9f-b480-18d88777a4ed,CS204,Computer Networks,5c6be14e-c07c-5765-b70b-00d8b59281cc,3,theory
+eadb3af3-be7b-5160-ba0e-027171a48d99,CS205,Data Structures Lab,5c6be14e-c07c-5765-b70b-00d8b59281cc,2,lab
