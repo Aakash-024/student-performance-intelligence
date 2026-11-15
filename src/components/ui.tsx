@@ -1,6 +1,25 @@
+import { CheckCircle2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn, indicatorMeta } from "@/lib/utils";
 import type { Indicator } from "@/lib/types";
+
+/**
+ * Success banner rendered from a `?flash=` query parameter.
+ *
+ * Mutating server actions end with redirect(`...?flash=...`) instead of
+ * revalidatePath + return state: on production builds, revalidatePath-based
+ * action responses can hang open (vercel/next.js#95714), leaving forms stuck
+ * in the pending state even though the write committed. Pages are dynamic, so
+ * the redirect renders completely fresh data anyway.
+ */
+export function Flash({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className="mb-4 flex items-start gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800 ring-1 ring-emerald-200">
+      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> {message}
+    </p>
+  );
+}
 
 export function PageHeader({
   title,

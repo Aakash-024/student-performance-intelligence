@@ -3,13 +3,18 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getDepartments, getSubjectPerformance, getSubjects, getTerms } from "@/lib/data";
 import { formatPercent, termLabel } from "@/lib/utils";
-import { Card, PageHeader, ProgressBar, StatCard } from "@/components/ui";
+import { Card, Flash, PageHeader, ProgressBar, StatCard } from "@/components/ui";
 import { SubjectBarChart, TermTrendChart } from "@/components/charts";
 import { CreateSubjectForm, EditSubjectForm } from "./subject-form";
 
 export const metadata = { title: "Subjects" };
 
-export default async function SubjectsPage() {
+export default async function SubjectsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ flash?: string }>;
+}) {
+  const { flash } = await searchParams;
   const { profile } = await requireUser();
   const supabase = await createClient();
 
@@ -70,6 +75,8 @@ export default async function SubjectsPage() {
         title="Subjects"
         description="Subject catalogue with live performance, pass rates, and semester history."
       />
+
+      <Flash message={flash} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Subjects" value={subjects.length} hint={`${departments.length} department`} icon={BookOpen} tone="indigo" />

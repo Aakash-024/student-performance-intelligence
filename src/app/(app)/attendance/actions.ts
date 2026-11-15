@@ -1,7 +1,6 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -56,9 +55,9 @@ export async function createSession(
     return { error: error.message };
   }
 
-  revalidatePath("/attendance");
-  revalidatePath("/dashboard");
-  redirect(`/attendance/${data.id}`);
+  redirect(
+    `/attendance/${data.id}?flash=${encodeURIComponent("Session created — record attendance below.")}`,
+  );
 }
 
 export async function saveAttendance(
@@ -117,12 +116,9 @@ export async function saveAttendance(
     return { error: error.message };
   }
 
-  revalidatePath(`/attendance/${sessionId}`);
-  revalidatePath("/attendance");
-  revalidatePath("/students");
-  revalidatePath("/dashboard");
-  revalidatePath("/analytics");
-  return {
-    success: `Saved attendance for ${rows.length} students · ${present.size} present, ${rows.length - present.size} absent.`,
-  };
+  redirect(
+    `/attendance/${sessionId}?flash=${encodeURIComponent(
+      `Saved attendance for ${rows.length} students · ${present.size} present, ${rows.length - present.size} absent.`,
+    )}`,
+  );
 }

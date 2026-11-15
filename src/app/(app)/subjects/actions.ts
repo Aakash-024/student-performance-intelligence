@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -50,9 +50,7 @@ export async function createSubject(
     return { error: error.message };
   }
 
-  revalidatePath("/subjects");
-  revalidatePath("/dashboard");
-  return { success: `${code} — ${name} created.` };
+  redirect(`/subjects?flash=${encodeURIComponent(`${code} — ${name} created.`)}`);
 }
 
 export async function updateSubject(
@@ -80,7 +78,5 @@ export async function updateSubject(
 
   if (error) return { error: error.message };
 
-  revalidatePath("/subjects");
-  revalidatePath(`/subjects/${id}`);
-  return { success: "Subject updated." };
+  redirect(`/subjects?flash=${encodeURIComponent("Subject updated.")}`);
 }

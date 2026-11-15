@@ -10,12 +10,17 @@ import {
   getTerms,
 } from "@/lib/data";
 import { termLabel } from "@/lib/utils";
-import { Badge, Card, EmptyState, PageHeader, StatCard } from "@/components/ui";
+import { Badge, Card, EmptyState, Flash, PageHeader, StatCard } from "@/components/ui";
 import { AssignClassForm, CreateTeacherForm, RemoveAssignmentButton } from "./teacher-form";
 
 export const metadata = { title: "Teachers" };
 
-export default async function TeachersPage() {
+export default async function TeachersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ flash?: string }>;
+}) {
+  const { flash } = await searchParams;
   await requireAdmin();
   const supabase = await createClient();
 
@@ -49,6 +54,8 @@ export default async function TeachersPage() {
         title="Teachers"
         description="Create teacher accounts and control exactly which classes they can grade and mark attendance for."
       />
+
+      <Flash message={flash} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Teachers" value={teachers.length} hint={`${assignments.length} class assignments`} icon={Users} tone="indigo" />

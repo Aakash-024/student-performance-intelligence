@@ -12,7 +12,7 @@ import {
   getTerms,
 } from "@/lib/data";
 import { assessmentLabel, formatDate, formatPercent, termLabel } from "@/lib/utils";
-import { Card, EmptyState, PageHeader, ProgressBar, StatCard } from "@/components/ui";
+import { Card, EmptyState, Flash, PageHeader, ProgressBar, StatCard } from "@/components/ui";
 import { CreateAssessmentForm, EditAssessmentForm } from "./assessment-form";
 
 export const metadata = { title: "Assessments" };
@@ -20,7 +20,7 @@ export const metadata = { title: "Assessments" };
 export default async function AssessmentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ term?: string; subject?: string }>;
+  searchParams: Promise<{ term?: string; subject?: string; flash?: string }>;
 }) {
   const params = await searchParams;
   const { user, profile } = await requireUser();
@@ -92,6 +92,8 @@ export default async function AssessmentsPage({
         title="Assessments"
         description="Assessment structure, mark coverage, and entry points for every subject."
       />
+
+      <Flash message={params.flash} />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Assessments" value={filtered.length} hint={`${terms.length} terms · ${subjects.length} subjects`} icon={ClipboardList} tone="indigo" />

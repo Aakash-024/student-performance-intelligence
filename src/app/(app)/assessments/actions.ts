@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAdmin, requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -46,9 +46,7 @@ export async function createAssessment(
     return { error: error.message };
   }
 
-  revalidatePath("/assessments");
-  revalidatePath("/dashboard");
-  return { success: "Assessment created." };
+  redirect(`/assessments?flash=${encodeURIComponent("Assessment created.")}`);
 }
 
 export async function updateAssessment(
@@ -74,10 +72,7 @@ export async function updateAssessment(
 
   if (error) return { error: error.message };
 
-  revalidatePath("/assessments");
-  revalidatePath(`/assessments/${id}`);
-  revalidatePath("/dashboard");
-  return { success: "Assessment updated." };
+  redirect(`/assessments?flash=${encodeURIComponent("Assessment updated.")}`);
 }
 
 export async function deleteAssessment(formData: FormData) {
@@ -87,8 +82,7 @@ export async function deleteAssessment(formData: FormData) {
 
   const supabase = await createClient();
   await supabase.from("assessments").delete().eq("id", id);
-  revalidatePath("/assessments");
-  revalidatePath("/dashboard");
+  redirect(`/assessments?flash=${encodeURIComponent("Assessment deleted.")}`);
 }
 
 export async function saveMarks(
@@ -160,11 +154,9 @@ export async function saveMarks(
     return { error: error.message };
   }
 
-  revalidatePath(`/assessments/${assessmentId}`);
-  revalidatePath("/assessments");
-  revalidatePath("/students");
-  revalidatePath(`/students`);
-  revalidatePath("/dashboard");
-  revalidatePath("/analytics");
-  return { success: `Saved ${entries.length} mark${entries.length === 1 ? "" : "s"} as ${profile?.full_name ?? "user"}.` };
+  redirect(
+    `/assessments/${assessmentId}?flash=${encodeURIComponent(
+      `Saved ${entries.length} mark${entries.length === 1 ? "" : "s"} as ${profile?.full_name ?? "user"}.`,
+    )}`,
+  );
 }

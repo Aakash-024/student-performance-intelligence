@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -60,8 +60,9 @@ export async function createTeacher(
     return { error: profileError.message };
   }
 
-  revalidatePath("/teachers");
-  return { success: `${fullName} (${email}) can now sign in as a teacher.` };
+  redirect(
+    `/teachers?flash=${encodeURIComponent(`${fullName} (${email}) can now sign in as a teacher.`)}`,
+  );
 }
 
 export async function addAssignment(
@@ -92,9 +93,7 @@ export async function addAssignment(
     return { error: error.message };
   }
 
-  revalidatePath("/teachers");
-  revalidatePath("/dashboard");
-  return { success: "Class assigned." };
+  redirect(`/teachers?flash=${encodeURIComponent("Class assigned.")}`);
 }
 
 export async function removeAssignment(formData: FormData) {
@@ -104,6 +103,5 @@ export async function removeAssignment(formData: FormData) {
 
   const supabase = await createClient();
   await supabase.from("teacher_assignments").delete().eq("id", id);
-  revalidatePath("/teachers");
-  revalidatePath("/dashboard");
+  redirect(`/teachers?flash=${encodeURIComponent("Assignment removed.")}`);
 }

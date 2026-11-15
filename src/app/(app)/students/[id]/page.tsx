@@ -11,7 +11,7 @@ import {
   getTerms,
 } from "@/lib/data";
 import { formatDate, formatPercent, indicatorMeta, termLabel } from "@/lib/utils";
-import { Card, IndicatorBadge, PageHeader, ProgressBar, StatCard } from "@/components/ui";
+import { Card, Flash, IndicatorBadge, PageHeader, ProgressBar, StatCard } from "@/components/ui";
 import { AssessmentTrendChart, SubjectRadarChart } from "@/components/charts";
 import { ReportButton } from "@/components/report-button";
 import { EditStudentForm } from "../student-form";
@@ -20,10 +20,13 @@ export const metadata = { title: "Student" };
 
 export default async function StudentDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ flash?: string }>;
 }) {
   const { id } = await params;
+  const { flash } = await searchParams;
   const { profile } = await requireUser();
   const supabase = await createClient();
 
@@ -123,6 +126,8 @@ export default async function StudentDetailPage({
       >
         <ArrowLeft className="h-4 w-4" /> Back to students
       </Link>
+
+      <Flash message={flash} />
 
       <PageHeader
         title={student.name}

@@ -10,17 +10,20 @@ import {
   getTeacherContext,
 } from "@/lib/data";
 import { assessmentLabel, formatDate, formatPercent, termLabel } from "@/lib/utils";
-import { Card, PageHeader, ProgressBar, StatCard } from "@/components/ui";
+import { Card, Flash, PageHeader, ProgressBar, StatCard } from "@/components/ui";
 import { MarksForm } from "./marks-form";
 
 export const metadata = { title: "Marks entry" };
 
 export default async function AssessmentDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ flash?: string }>;
 }) {
   const { id } = await params;
+  const { flash } = await searchParams;
   const { user, profile } = await requireUser();
   const supabase = await createClient();
 
@@ -97,6 +100,8 @@ export default async function AssessmentDetailPage({
       >
         <ArrowLeft className="h-4 w-4" /> Back to assessments
       </Link>
+
+      <Flash message={flash} />
 
       <PageHeader
         title={`${subject?.code ?? "—"} · ${assessmentLabel(assessment.type)}`}

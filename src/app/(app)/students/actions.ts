@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -90,7 +90,6 @@ export async function createStudent(
 
       if (enrollError) {
         // The student exists; report the partial failure instead of hiding it.
-        revalidatePath("/students");
         return {
           error: `Student created, but enrolling them in subjects failed: ${enrollError.message}`,
         };
@@ -98,10 +97,9 @@ export async function createStudent(
     }
   }
 
-  revalidatePath("/students");
-  revalidatePath("/dashboard");
-  revalidatePath("/analytics");
-  return { success: `${name} (${registerNumber}) added and enrolled in the current term.` };
+  redirect(
+    `/students?flash=${encodeURIComponent(`${name} (${registerNumber}) added and enrolled in the current term.`)}`,
+  );
 }
 
 export async function updateStudent(
@@ -144,9 +142,5 @@ export async function updateStudent(
 
   if (error) return { error: error.message };
 
-  revalidatePath("/students");
-  revalidatePath(`/students/${id}`);
-  revalidatePath("/dashboard");
-  revalidatePath("/analytics");
-  return { success: "Student record updated." };
+  redirect(`/students/${id}?flash=${encodeURIComponent("Student record updated.")}`);
 }
