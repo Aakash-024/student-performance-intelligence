@@ -1,15 +1,15 @@
 /**
- * Z.ai GLM chat client for the V2 AI agents.
+ * Groq chat client (GPT OSS models) for the V2 AI agents.
  *
  * Server-only by convention: this module is imported exclusively from server
- * actions, and the API key lives in ZAI_API_KEY (never NEXT_PUBLIC_*).
+ * actions, and the API key lives in GROQ_API_KEY (never NEXT_PUBLIC_*).
  *
- * Z.ai exposes an OpenAI-compatible chat completions endpoint, so a plain
+ * Groq exposes an OpenAI-compatible chat completions endpoint, so a plain
  * fetch keeps the dependency count at zero and stays easy to swap later.
  */
 
-const DEFAULT_API_BASE = "https://api.z.ai/api/paas/v4";
-const DEFAULT_MODEL = "glm-4.6";
+const DEFAULT_API_BASE = "https://api.groq.com/openai/v1";
+const DEFAULT_MODEL = "openai/gpt-oss-120b";
 
 export interface ChatMessage {
   role: "system" | "user";
@@ -23,16 +23,16 @@ export interface ChatOptions {
 }
 
 function apiBase() {
-  return (process.env.ZAI_API_BASE || DEFAULT_API_BASE).replace(/\/+$/, "");
+  return (process.env.GROQ_API_BASE || DEFAULT_API_BASE).replace(/\/+$/, "");
 }
 
 function model() {
-  return process.env.ZAI_MODEL || DEFAULT_MODEL;
+  return process.env.GROQ_MODEL || DEFAULT_MODEL;
 }
 
 /** True when an API key is present, so the UI can explain a missing setup. */
 export function isAiConfigured() {
-  return Boolean(process.env.ZAI_API_KEY);
+  return Boolean(process.env.GROQ_API_KEY);
 }
 
 /**
@@ -40,10 +40,10 @@ export function isAiConfigured() {
  * message safe to show to signed-in staff when the call fails.
  */
 export async function chatComplete(options: ChatOptions) {
-  const apiKey = process.env.ZAI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "AI is not configured on this deployment: the ZAI_API_KEY environment variable is missing.",
+      "AI is not configured on this deployment: the GROQ_API_KEY environment variable is missing.",
     );
   }
 
@@ -68,12 +68,12 @@ export async function chatComplete(options: ChatOptions) {
     });
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : "network error";
-    throw new Error(`Could not reach the GLM API: ${message}`);
+    throw new Error(`Could not reach the Groq API: ${message}`);
   }
 
   if (!response.ok) {
     const body = await response.text().catch(() => "");
-    throw new Error(`GLM API returned ${response.status}. ${body.slice(0, 300)}`);
+    throw new Error(`Groq API returned ${response.status}. ${body.slice(0, 300)}`);
   }
 
   const payload = (await response.json()) as {
@@ -82,7 +82,7 @@ export async function chatComplete(options: ChatOptions) {
   };
 
   const text = payload.choices?.[0]?.message?.content?.trim();
-  if (!text) throw new Error("GLM API returned an empty response.");
+  if (!text) throw new Error("Groq API returned an empty response.");
 
   return {
     text,
@@ -92,7 +92,7 @@ export async function chatComplete(options: ChatOptions) {
 }
 
 /**
- * GLM sometimes wraps JSON answers in ```json fences. This extracts the
+ * Models sometimes wrap JSON answers in ```json fences. This extracts the
  * outermost JSON object so callers can parse agent output defensively.
  */
 export function extractJsonObject(text: string) {

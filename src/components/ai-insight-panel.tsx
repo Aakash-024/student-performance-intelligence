@@ -31,7 +31,7 @@ export function AiInsightPanel({ studentId }: { studentId: string }) {
             <Sparkles className="h-4 w-4 text-indigo-500" /> AI insight
           </h2>
           <p className="mt-0.5 text-xs text-slate-500">
-            GLM analysis of this student&apos;s platform data, with the evidence it used
+            AI analysis of this student&apos;s platform data, with the evidence it used
           </p>
         </div>
       </div>
@@ -128,7 +128,7 @@ export function AiInsightPanel({ studentId }: { studentId: string }) {
 
             <p className="flex items-start gap-1.5 border-t border-indigo-100/70 pt-3 text-[11px] text-slate-500">
               <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-indigo-400" />
-              {state.model ?? "GLM"} · {((state.durationMs ?? 0) / 1000).toFixed(1)}s · Generated
+              {state.model ?? "AI"} · {((state.durationMs ?? 0) / 1000).toFixed(1)}s · Generated
               from your platform data — verify before acting. Advisory only; nothing is written to
               student records.
             </p>

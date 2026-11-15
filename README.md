@@ -95,7 +95,7 @@ How it stays safe:
   row in `ai_insights` recording who ran which agent.
 - Every conclusion must cite the figures it is based on; the model is instructed never to invent
   numbers, and the UI shows the evidence list.
-- The GLM API key is server-only (`ZAI_API_KEY`); it never reaches the browser.
+- The Groq API key is server-only (`GROQ_API_KEY`); it never reaches the browser.
 
 ---
 
@@ -174,9 +174,9 @@ SUPABASE_SECRET_KEY=sb_secret_...
 - `NEXT_PUBLIC_*` values are visible in the browser. Only put the publishable key there.
 - `SUPABASE_SECRET_KEY` is server-only. It is used by teacher creation and the seed script. Never
   expose it to the client.
-- `ZAI_API_KEY` (optional, V2 AI agents) is server-only. Get a key from Z.ai; without it the AI
-  panels explain that AI is not configured instead of failing silently. `ZAI_MODEL` optionally
-  overrides the GLM model (default `glm-4.6`).
+- `GROQ_API_KEY` (optional, V2 AI agents) is server-only. Get a free key at
+  https://console.groq.com; without it the AI panels explain that AI is not configured instead of
+  failing silently. `GROQ_MODEL` optionally overrides the model (default `openai/gpt-oss-120b`).
 
 ### 4. Create the database
 
