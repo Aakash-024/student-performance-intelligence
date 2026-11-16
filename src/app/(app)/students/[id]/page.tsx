@@ -16,6 +16,7 @@ import { formatDate, formatPercent, indicatorMeta, termLabel } from "@/lib/utils
 import { Card, IndicatorBadge, PageHeader, ProgressBar, StatCard } from "@/components/ui";
 import { AssessmentTrendChart, SubjectRadarChart } from "@/components/charts";
 import { ReportButton } from "@/components/report-button";
+import { AiInsightPanel } from "@/components/ai-insight-panel";
 import { progressReportConfig } from "@/lib/report-config";
 import { EditStudentForm } from "../student-form";
 
@@ -326,6 +327,8 @@ export default async function StudentDetailPage({
               <li>Improving: gained 5+ points versus the previous term.</li>
             </ul>
           </Card>
+
+          <AiInsightPanel studentId={student.id} />
         </div>
       </div>
 
