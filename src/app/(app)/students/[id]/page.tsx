@@ -17,6 +17,9 @@ import { Card, IndicatorBadge, PageHeader, ProgressBar, StatCard } from "@/compo
 import { AssessmentTrendChart, SubjectRadarChart } from "@/components/charts";
 import { ReportButton } from "@/components/report-button";
 import { AiInsightPanel } from "@/components/ai-insight-panel";
+import { MlForecastCard } from "@/components/ml-forecast-card";
+import { buildFeatures } from "@/lib/ml/features";
+import { predict } from "@/lib/ml/predict";
 import { progressReportConfig } from "@/lib/report-config";
 import { EditStudentForm } from "../student-form";
 
@@ -110,6 +113,13 @@ export default async function StudentDetailPage({
       )
       .map((mark) => [mark.assessments!.subject_id, mark]),
   );
+
+  const mlFeatures = buildFeatures({
+    overview,
+    marks,
+    termName: currentTerm?.name ?? "",
+  });
+  const prediction = predict(mlFeatures);
 
   const reportData = {
     name: student.name,
@@ -329,6 +339,8 @@ export default async function StudentDetailPage({
           </Card>
 
           <AiInsightPanel studentId={student.id} />
+
+          <MlForecastCard prediction={prediction} />
         </div>
       </div>
 

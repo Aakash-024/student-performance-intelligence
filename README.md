@@ -97,6 +97,32 @@ How it stays safe:
   numbers, and the UI shows the evidence list.
 - The Groq API key is server-only (`GROQ_API_KEY`); it never reaches the browser.
 
+### ML forecasts (Phase 5, first pass)
+
+A statistical layer trained on the platform's own historical data (clearly separated from both the
+rule-based indicators and the LLM agents):
+
+- **Next-term average forecast** — ridge regression trained on `Semester 3 → Semester 4`
+  transitions. Cross-validated MAE ≈ 4.4 points, R² ≈ 0.75. Rendered on the student page with a
+  ± typical-error band.
+- **At-risk probability** — logistic regression for the platform's at-risk rule
+  (average < 40% or attendance < 60%). Cross-validated AUC ≈ 0.99 on the demo dataset.
+- **"Why this prediction"** — every prediction decomposes into per-feature contributions
+  (feature × weight, in percentage points). No black box.
+- **Model card** — the card footer publishes the training date and cross-validated metrics.
+
+Design rules:
+
+- The models are **linear** (ridge + logistic) so predictions are exactly explainable; accuracy is
+  not maximized at the cost of transparency.
+- Predictions are **estimates alongside** the rule-based indicator — never a replacement. The
+  rule-based classification remains the source of truth for flags.
+- Training runs offline in Python (`python scripts/ml/train.py`, Pandas + NumPy only, no
+  scikit-learn); inference runs in pure TypeScript (`src/lib/ml/`) so serverless deployment needs
+  no Python. `src/lib/ml/model.json` is the versioned artifact linking the two.
+- Features computed at inference time in `src/lib/ml/features.ts` must match `train.py` exactly;
+  changing one requires changing both and retraining.
+
 ---
 
 ## Architecture
@@ -120,6 +146,7 @@ src/
     auth.ts                requireUser / requireAdmin
     data.ts                typed read helpers
     ai/                    V2 agent layer (provider, prompts, context, agents, audit)
+    ml/                    Phase 5 ML inference (features, predict, model.json)
     types.ts, utils.ts     shared types and formatting
   proxy.ts                 refreshes the Supabase session on every request
 
@@ -136,6 +163,7 @@ data/
   generated/*.csv          the actual seed data (150 students, 6000 marks, ...)
 
 scripts/seed.mjs           deterministic reseed over the PostgREST API
+scripts/ml/train.py        Phase 5 model training (Pandas + NumPy -> model.json)
 ```
 
 ### Why the data is synthetic and deterministic
@@ -314,9 +342,12 @@ This was tested against the live project, not just the UI.
 
 ## Roadmap (V2)
 
-- AI/ML risk prediction and advisory agents — **Phase 4 in progress** on
-  `feature/v2-ai-agents` (Risk Analysis Agent built; analyst, recommendations,
-  teacher assistant and report summary agents to follow).
+- AI/ML risk prediction and advisory agents — **Phase 4 delivered** (Student Risk
+  Analysis Agent; the remaining Phase 4 agents were intentionally dropped from
+  scope) and **Phase 5 first pass delivered** (next-term average forecast +
+  at-risk probability with explainable contributions, `feature/v2-ai-agents`).
+  Possible next steps: class-level trend forecasts on the analytics page,
+  gradient-boosted model comparison, periodic retraining.
 - CSV import for real institutional data.
 - Email/notification workflows for at-risk students.
 - Audit log for mark corrections.
