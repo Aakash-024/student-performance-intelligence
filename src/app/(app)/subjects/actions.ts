@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -10,30 +10,44 @@ export interface FormState {
 
 const SUBJECT_TYPES = ["theory", "lab", "elective"] as const;
 
+function cleanCode(value: unknown) {
+  return String(value ?? "").trim().toUpperCase();
+}
+
+function codeProblem(code: string): string | null {
+  if (!code) return "Code is required.";
+  if (!/^[A-Z0-9]{2,12}$/.test(code)) {
+    return "Code must be 2-12 characters, letters and digits only.";
+  }
+  return null;
+}
+
+function detailsProblem(name: string, departmentId: string, credits: number, type: string) {
+  if (!name) return "Name is required.";
+  if (!departmentId) return "Department is required.";
+  if (!Number.isInteger(credits) || credits < 1 || credits > 10) {
+    return "Credits must be a whole number between 1 and 10.";
+  }
+  if (!SUBJECT_TYPES.includes(type as (typeof SUBJECT_TYPES)[number])) {
+    return "Choose a valid subject type.";
+  }
+  return null;
+}
+
 export async function createSubject(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireAdmin();
+  await requireUser();
 
-  const code = String(formData.get("code") ?? "").trim().toUpperCase();
+  const code = cleanCode(formData.get("code"));
   const name = String(formData.get("name") ?? "").trim();
   const departmentId = String(formData.get("department_id") ?? "").trim();
   const credits = Number(formData.get("credits") ?? 0);
   const type = String(formData.get("type") ?? "theory");
 
-  if (!code || !name || !departmentId) {
-    return { error: "Code, name, and department are required." };
-  }
-  if (!/^[A-Z0-9]{2,12}$/.test(code)) {
-    return { error: "Code must be 2-12 characters, letters and digits only." };
-  }
-  if (!Number.isInteger(credits) || credits < 1 || credits > 10) {
-    return { error: "Credits must be a whole number between 1 and 10." };
-  }
-  if (!SUBJECT_TYPES.includes(type as (typeof SUBJECT_TYPES)[number])) {
-    return { error: "Choose a valid subject type." };
-  }
+  const problem = codeProblem(code) ?? detailsProblem(name, departmentId, credits, type);
+  if (problem) return { error: problem };
 
   const supabase = await createClient();
   const { error } = await supabase.from("subjects").insert({
@@ -56,26 +70,57 @@ export async function updateSubject(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireAdmin();
+  await requireUser();
 
-  const id = String(formData.get("id") ?? "");
+  const id = String(formData.get("id") ?? "").trim();
+  const code = cleanCode(formData.get("code"));
   const name = String(formData.get("name") ?? "").trim();
+  const departmentId = String(formData.get("department_id") ?? "").trim();
   const credits = Number(formData.get("credits") ?? 0);
   const type = String(formData.get("type") ?? "theory");
 
   if (!id) return { error: "Missing subject." };
-  if (!name) return { error: "Name is required." };
-  if (!Number.isInteger(credits) || credits < 1 || credits > 10) {
-    return { error: "Credits must be a whole number between 1 and 10." };
-  }
+  const problem = codeProblem(code) ?? detailsProblem(name, departmentId, credits, type);
+  if (problem) return { error: problem };
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("subjects")
-    .update({ name, credits, type })
+    .update({ code, name, department_id: departmentId, credits, type })
     .eq("id", id);
 
+  if (error) {
+    if (error.code === "23505") return { error: `Subject code ${code} already exists.` };
+    return { error: error.message };
+  }
+
+  return { success: `${code} — ${name} updated.` };
+}
+
+export async function deleteSubject(
+  _prev: FormState | undefined,
+  formData: FormData,
+): Promise<FormState> {
+  await requireUser();
+
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) return { error: "Missing subject." };
+
+  const supabase = await createClient();
+
+  const [{ count: assessmentCount }, { count: enrollmentCount }] = await Promise.all([
+    supabase.from("assessments").select("id", { count: "exact", head: true }).eq("subject_id", id),
+    supabase.from("enrollments").select("id", { count: "exact", head: true }).eq("subject_id", id),
+  ]);
+
+  if ((assessmentCount ?? 0) > 0 || (enrollmentCount ?? 0) > 0) {
+    return {
+      error: "This subject still has assessments or enrolments. Remove those first.",
+    };
+  }
+
+  const { error } = await supabase.from("subjects").delete().eq("id", id);
   if (error) return { error: error.message };
 
-  return { success: "Subject updated." };
+  return { success: "Subject deleted." };
 }
