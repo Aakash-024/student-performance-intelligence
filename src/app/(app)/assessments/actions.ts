@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin, requireUser } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -8,13 +8,13 @@ export interface FormState {
   success?: string;
 }
 
-const TYPES = ["cat1", "cat2", "internal", "semester"] as const;
+const TYPES = ["cat1", "cat2", "semester"] as const;
 
 export async function createAssessment(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireAdmin();
+  await requireUser();
 
   const subjectId = String(formData.get("subject_id") ?? "");
   const termId = String(formData.get("academic_term_id") ?? "");
@@ -52,30 +52,37 @@ export async function updateAssessment(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireAdmin();
+  await requireUser();
 
   const id = String(formData.get("id") ?? "");
+  const type = String(formData.get("type") ?? "");
   const maxMarks = Number(formData.get("max_marks") ?? 0);
   const weightage = Number(formData.get("weightage_percent") ?? 0);
   const date = String(formData.get("date") ?? "").trim();
 
   if (!id) return { error: "Missing assessment." };
+  if (!TYPES.includes(type as (typeof TYPES)[number])) return { error: "Choose a valid assessment type." };
   if (!(maxMarks > 0)) return { error: "Maximum marks must be greater than zero." };
   if (!(weightage >= 0 && weightage <= 100)) return { error: "Weightage must be between 0 and 100." };
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("assessments")
-    .update({ max_marks: maxMarks, weightage_percent: weightage, date: date || null })
+    .update({ type, max_marks: maxMarks, weightage_percent: weightage, date: date || null })
     .eq("id", id);
 
-  if (error) return { error: error.message };
+  if (error) {
+    if (error.code === "23505") {
+      return { error: "That subject already has this assessment type in the selected term." };
+    }
+    return { error: error.message };
+  }
 
   return { success: "Assessment updated." };
 }
 
 export async function deleteAssessment(formData: FormData) {
-  await requireAdmin();
+  await requireUser();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 

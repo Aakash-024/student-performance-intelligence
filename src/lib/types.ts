@@ -96,7 +96,7 @@ export interface Assessment {
   id: string;
   subject_id: string;
   academic_term_id: string;
-  type: "cat1" | "cat2" | "internal" | "semester";
+  type: "cat1" | "cat2" | "semester";
   max_marks: number;
   weightage_percent: number;
   date: string | null;

@@ -46,7 +46,6 @@ FEATURE_NAMES = [
     "subjects_passed_ratio", # passed / total subjects
     "cat1_pct",              # average CAT-1 score %
     "cat2_pct",              # average CAT-2 score %
-    "internal_pct",          # average internal assessment score %
     "semester_pct",          # average semester exam score %
     "cat_trend",             # CAT2 minus CAT1 (within-term trajectory)
     "absent_rate",           # share of assessments marked absent
@@ -94,7 +93,7 @@ def build_features(marks: pd.DataFrame, assessments: pd.DataFrame,
     history_key = history.set_index(["student_id", "academic_term_id"]).index
     for name, column in [
         ("cat1_pct", "cat1"), ("cat2_pct", "cat2"),
-        ("internal_pct", "internal"), ("semester_pct", "semester"),
+        ("semester_pct", "semester"),
     ]:
         features[name] = per_type[column].reindex(history_key).to_numpy()
     features["cat_trend"] = cat_trend.reindex(history_key).to_numpy()
@@ -106,7 +105,6 @@ def build_features(marks: pd.DataFrame, assessments: pd.DataFrame,
     features = features.fillna({
         "cat1_pct": pd.Series(term_avg, index=features.index),
         "cat2_pct": pd.Series(term_avg, index=features.index),
-        "internal_pct": pd.Series(term_avg, index=features.index),
         "semester_pct": pd.Series(term_avg, index=features.index),
         "cat_trend": 0.0,
         "absent_rate": 0.0,

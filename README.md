@@ -38,9 +38,9 @@ trigger prevents a signed-in user from promoting themselves.
 
 ### Academic structure
 
-- Departments, sections, subjects, academic terms (2 semesters).
-- Assessments of type `cat1`, `cat2`, `internal`, `semester` with configurable max marks and
-  weightage.
+- Departments, sections, subjects, academic terms (up to 8 semesters).
+- Assessments of type `cat1`, `cat2`, `semester` with configurable max marks and
+  weightage. Teachers and administrators can edit the whole structure at any time.
 - Student records with register number, section, year and status.
 - Enrollments linking students to subjects per term.
 
