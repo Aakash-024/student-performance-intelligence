@@ -5,6 +5,9 @@ academic structure and staff; teachers enter marks and attendance for the classe
 everyone sees live, rule-based performance analytics and can download a professional PDF student
 report.
 
+> **New maintainer?** Start with [`docs/ownership-guide.md`](docs/ownership-guide.md) — a complete
+> beginner-friendly manual for this project: how it works, how to change it, how to deploy it.
+
 Built with **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS**, **Supabase**
 (Postgres + Auth + Row Level Security) and **Recharts**.
 
