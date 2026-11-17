@@ -151,7 +151,9 @@ export function EditAssessmentForm({ assessment }: { assessment: Assessment }) {
   const router = useRouter();
 
   // Deleting returns no state; refresh explicitly so the list drops the row.
+  // Marks and audit rows cascade with the assessment, so warn first.
   async function handleDelete(formData: FormData) {
+    if (!window.confirm("Delete this assessment and all marks recorded for it?")) return;
     await deleteAssessment(formData);
     router.refresh();
   }
