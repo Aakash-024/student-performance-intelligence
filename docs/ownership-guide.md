@@ -9,7 +9,8 @@ appears, and every explanation points at a **real file in this project** so you 
 see the concept in action.
 
 **How to read this:** start with §1 once. After that, each section stands alone — jump to what
-you need. The glossary at the end (§14) defines anything that sounds unfamiliar.
+you need. In a hurry? [`quick-reference.md`](quick-reference.md) is the 2-minute card version.
+The glossary at the end (§14) defines anything that sounds unfamiliar.
 
 ---
 
