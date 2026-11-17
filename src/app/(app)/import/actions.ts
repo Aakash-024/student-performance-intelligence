@@ -134,6 +134,13 @@ function readCsv(formData: FormData): string {
   return String(formData.get("csv") ?? "");
 }
 
+/** The upload form posts a File; the commit form posts the same text back. */
+async function readUpload(formData: FormData): Promise<string> {
+  const file = formData.get("file");
+  if (file instanceof File && file.size) return file.text();
+  return readCsv(formData);
+}
+
 function validEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -517,7 +524,7 @@ async function buildMarks(
 /** Preview a students CSV. Nothing is written. */
 export async function previewStudents(_prev: PreviewState | undefined, formData: FormData): Promise<PreviewState> {
   await requireUser();
-  const csv = readCsv(formData);
+  const csv = await readUpload(formData);
   const supabase = await createClient();
   const built = await buildStudents(supabase, csv);
   if (built.error) return { csv, rows: [], counts: countsOf([]), error: built.error };
@@ -527,7 +534,7 @@ export async function previewStudents(_prev: PreviewState | undefined, formData:
 /** Preview a marks CSV. Nothing is written. */
 export async function previewMarks(_prev: PreviewState | undefined, formData: FormData): Promise<PreviewState> {
   const { user, profile } = await requireUser();
-  const csv = readCsv(formData);
+  const csv = await readUpload(formData);
   const supabase = await createClient();
   const built = await buildMarks(supabase, csv, user.id, profile?.role);
   if (built.error) return { csv, rows: [], counts: countsOf([]), error: built.error };

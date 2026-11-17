@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import {
   AlertCircle,
   CheckCircle2,
@@ -90,58 +90,35 @@ function PreviewTable({ rows }: { rows: ImportRowView[] }) {
   );
 }
 
-function UploadForm({
-  action,
-  pending,
-  label,
-}: {
-  action: (formData: FormData) => void | Promise<void>;
-  pending: boolean;
-  label: string;
-}) {
-  return (
-    <form action={action} className="flex flex-wrap items-end gap-3">
-      <label className="min-w-64 flex-1 text-sm">
-        <span className="mb-1 block font-medium text-slate-700">CSV file</span>
-        <input
-          type="file"
-          name="file"
-          accept=".csv,text/csv"
-          required
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-3 file:py-1.5 file:text-white"
-        />
-      </label>
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-70"
-      >
-        {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-        {pending ? "Checking…" : label}
-      </button>
-    </form>
-  );
-}
-
-function ImportPanel({
-  kind,
-  preview,
-  previewAction,
-  previewing,
-  commit,
-  commitAction,
-  committing,
-}: {
-  kind: "students" | "marks";
-  preview: PreviewState;
-  previewAction: (formData: FormData) => void | Promise<void>;
-  previewing: boolean;
-  commit: CommitState;
-  commitAction: (formData: FormData) => void | Promise<void>;
-  committing: boolean;
-}) {
-  const valid = preview.counts.ready + preview.counts.update;
+function ImportFlow({ kind }: { kind: "students" | "marks" }) {
   const isStudents = kind === "students";
+
+  // Explicit state instead of useActionState so that validating a new file can
+  // clear the previous commit result (otherwise the Import button stays hidden
+  // after the first import).
+  const [preview, setPreview] = useState<PreviewState>(emptyPreview);
+  const [previewing, setPreviewing] = useState(false);
+  const [commit, setCommit] = useState<CommitState>(emptyCommit);
+  const [committing, setCommitting] = useState(false);
+
+  useRefreshOnSuccess(commit);
+
+  async function handlePreview(formData: FormData) {
+    setPreviewing(true);
+    const result = await (isStudents ? previewStudentsAction : previewMarksAction)(undefined, formData);
+    setPreview(result);
+    setCommit(emptyCommit);
+    setPreviewing(false);
+  }
+
+  async function handleCommit(formData: FormData) {
+    setCommitting(true);
+    const result = await (isStudents ? commitStudentsAction : commitMarksAction)(undefined, formData);
+    setCommit(result);
+    setCommitting(false);
+  }
+
+  const valid = preview.counts.ready + preview.counts.update;
   const columns = isStudents
     ? "register_number, name, email, section, current_year, status"
     : "register_number, subject_code, term, assessment, marks_obtained, is_absent";
@@ -172,7 +149,26 @@ function ImportPanel({
         </div>
 
         <div className="mt-4 border-t border-slate-100 pt-4">
-          <UploadForm action={previewAction} pending={previewing} label="Validate file" />
+          <form action={handlePreview} className="flex flex-wrap items-end gap-3">
+            <label className="min-w-64 flex-1 text-sm">
+              <span className="mb-1 block font-medium text-slate-700">CSV file</span>
+              <input
+                type="file"
+                name="file"
+                accept=".csv,text/csv"
+                required
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-3 file:py-1.5 file:text-white"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={previewing}
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-70"
+            >
+              {previewing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {previewing ? "Checking…" : "Validate file"}
+            </button>
+          </form>
         </div>
         <div className="mt-3 space-y-2">
           <ErrorMessage message={preview.error} />
@@ -198,9 +194,9 @@ function ImportPanel({
                 {preview.counts.error} errors
               </span>
             </div>
-            <form action={commitAction}>
-              <input type="hidden" name="csv" value={preview.csv} />
-              {!commit.success ? (
+            {!commit.success ? (
+              <form action={handleCommit}>
+                <input type="hidden" name="csv" value={preview.csv} />
                 <button
                   type="submit"
                   disabled={committing || valid === 0}
@@ -209,8 +205,8 @@ function ImportPanel({
                   {committing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSpreadsheet className="h-4 w-4" />}
                   {committing ? "Importing…" : `Import ${valid} valid row${valid === 1 ? "" : "s"}`}
                 </button>
-              ) : null}
-            </form>
+              </form>
+            ) : null}
           </div>
           <p className="mt-2 text-xs text-slate-500">
             The file is validated again when you click Import. Rows with errors or skipped rows are not written.
@@ -224,26 +220,6 @@ function ImportPanel({
 
 export function ImportForm() {
   const [tab, setTab] = useState<"students" | "marks">("students");
-
-  const [studentPreview, studentPreviewAction, previewingStudents] = useActionState(
-    previewStudentsAction,
-    emptyPreview,
-  );
-  const [studentCommit, studentCommitAction, committingStudents] = useActionState(
-    commitStudentsAction,
-    emptyCommit,
-  );
-  const [markPreview, markPreviewAction, previewingMarks] = useActionState(
-    previewMarksAction,
-    emptyPreview,
-  );
-  const [markCommit, markCommitAction, committingMarks] = useActionState(
-    commitMarksAction,
-    emptyCommit,
-  );
-
-  useRefreshOnSuccess(studentCommit);
-  useRefreshOnSuccess(markCommit);
 
   return (
     <div>
@@ -262,27 +238,7 @@ export function ImportForm() {
         ))}
       </div>
 
-      {tab === "students" ? (
-        <ImportPanel
-          kind="students"
-          preview={studentPreview}
-          previewAction={studentPreviewAction}
-          previewing={previewingStudents}
-          commit={studentCommit}
-          commitAction={studentCommitAction}
-          committing={committingStudents}
-        />
-      ) : (
-        <ImportPanel
-          kind="marks"
-          preview={markPreview}
-          previewAction={markPreviewAction}
-          previewing={previewingMarks}
-          commit={markCommit}
-          commitAction={markCommitAction}
-          committing={committingMarks}
-        />
-      )}
+      <ImportFlow key={tab} kind={tab} />
     </div>
   );
 }
