@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -38,7 +38,7 @@ export async function createSubject(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const code = cleanCode(formData.get("code"));
   const name = String(formData.get("name") ?? "").trim();
@@ -70,7 +70,7 @@ export async function updateSubject(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const id = String(formData.get("id") ?? "").trim();
   const code = cleanCode(formData.get("code"));
@@ -101,7 +101,7 @@ export async function deleteSubject(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const id = String(formData.get("id") ?? "").trim();
   if (!id) return { error: "Missing subject." };

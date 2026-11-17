@@ -221,15 +221,24 @@ Run the migrations in order in the Supabase SQL editor (or with the Supabase CLI
 
 ### 5. Create users and demo accounts
 
-Create two Auth users in the Supabase dashboard (or with the admin API):
+Create the two public demo accounts (or use the in-app **Accounts** page as an admin):
 
-| Email               | Password      | Role    |
-| ------------------- | ------------- | ------- |
-| admin@college.edu   | `Admin@123`   | admin   |
-| teacher@college.edu | `Teacher@123` | teacher |
+| Email               | Password      | Role                      |
+| ------------------- | ------------- | ------------------------- |
+| admin@college.edu   | `Admin@123`   | viewer (read-only demo)   |
+| teacher@college.edu | `Teacher@123` | viewer (read-only demo)   |
 
-The profile trigger inserts a `profiles` row on signup. Ensure the admin's profile role is `admin`.
-For the demo teacher, create a `teacher_profiles` row and assignments:
+> Demo accounts are **read-only showcases** for people evaluating the project: they can browse
+> every page, but the database rejects every write from their role. They are locked in the
+> Accounts page (role and password cannot be changed from the app). Give real staff their own
+> individual accounts instead — never share the demo logins for real work.
+
+Real accounts for teachers/administrators are created in the app under **Accounts** (admin only),
+with individual emails and passwords you choose. That page needs `SUPABASE_SECRET_KEY` in the
+deployment environment.
+
+The profile trigger inserts a `profiles` row on signup (role comes from the user's metadata).
+For teachers who enter marks, create a `teacher_profiles` row and assignments:
 
 ```sql
 -- Replace the user UUID with the teacher's auth user id.
@@ -287,7 +296,9 @@ npm run build
 4. Deploy. Vercel runs `next build`.
 5. In Supabase **Authentication → URL Configuration**, set the site URL and add the Vercel domain
    to the redirect allow-list.
-6. Sign in on the deployed URL with the demo accounts and verify a mark save and a PDF download.
+6. Sign in on the deployed URL with a demo account and confirm everything renders read-only
+   (writes are refused). Then create a real admin/teacher account under **Accounts** and verify
+   mark entry and a PDF download with it.
 
 ### Notes specific to this build
 

@@ -25,6 +25,19 @@ export async function requireUser() {
   return current;
 }
 
+/**
+ * Admins and teachers may write data. Viewers (the public demo accounts) are
+ * read-only: every mutating server action calls this so a viewer is bounced
+ * back to the dashboard even if they post a crafted request.
+ */
+export async function requireStaff() {
+  const current = await requireUser();
+  if (current.profile?.role !== "admin" && current.profile?.role !== "teacher") {
+    redirect("/dashboard");
+  }
+  return current;
+}
+
 export async function requireAdmin() {
   const current = await requireUser();
   if (current.profile?.role !== "admin") redirect("/dashboard");

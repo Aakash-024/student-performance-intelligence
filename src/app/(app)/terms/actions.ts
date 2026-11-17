@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -57,7 +57,7 @@ export async function createTerm(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
   const input = readInput(formData);
   const problem = validate(input);
   if (problem) return { error: problem };
@@ -88,7 +88,7 @@ export async function updateTerm(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
   const input = readInput(formData);
   if (!input.id) return { error: "Missing term." };
   const problem = validate(input);
@@ -123,7 +123,7 @@ export async function deleteTerm(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
   const id = String(formData.get("id") ?? "").trim();
   if (!id) return { error: "Missing term." };
 

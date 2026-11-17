@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -17,7 +17,7 @@ export async function saveEnrollments(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const termId = String(formData.get("term_id") ?? "").trim();
   const sectionId = String(formData.get("section_id") ?? "").trim();

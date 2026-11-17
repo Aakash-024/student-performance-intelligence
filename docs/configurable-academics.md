@@ -62,6 +62,10 @@ them. Admins remain unrestricted.
 - **011** `students_insert_admin`/`students_update_admin` replaced with staff
   policies so teachers can create and edit students (needed for CSV import).
   Student **delete** stays admin-only.
+- **012** `viewer` role added to the role check; the 008–010 `WITH CHECK (true)`
+  policies re-created with `get_user_role() IN ('admin','teacher')` so read-only
+  demo logins cannot write; mark/AI audit inserts restricted to staff; both
+  public demo accounts flipped to `viewer`.
 
 All four were applied with:
 
@@ -83,6 +87,29 @@ do not hand-edit them.
 **Rule of thumb:** any change to `FEATURE_LABELS` in `src/lib/ml/features.ts`
 requires the same change in `FEATURE_NAMES` in `scripts/ml/train.py`, followed
 by a retrain. The two files are deliberately kept in lockstep.
+
+## User accounts, demo access, and CSV import
+
+Three roles exist:
+
+| Role | Reads | Writes | Intended for |
+|---|---|---|---|
+| `admin` | Everything | Everything, including Accounts | The owner / college admins |
+| `teacher` | Everything | Structure everywhere; marks & attendance only for assigned classes | Real teaching staff |
+| `viewer` | Everything | **Nothing** | Public demo / showcase visitors |
+
+- **Accounts page** (`/accounts`, admin only): creates Supabase auth users with individual
+  email + password via the secret key (`SUPABASE_SECRET_KEY`), resets passwords, changes roles.
+  The database trigger `handle_new_user` turns each new auth user into a profile with the
+  chosen role. The two public demo accounts are hard-locked: the app refuses to change their
+  role or password.
+- **Demo accounts are viewers.** `admin@college.edu` / `Admin@123` and
+  `teacher@college.edu` / `Teacher@123` keep their published passwords but their profile role
+  is `viewer`, so anyone using them can browse every page and change nothing.
+- **Defence in depth for viewers:** every mutating server action calls `requireStaff()`
+  (redirects viewers), every write form is hidden in the UI, and — critically — migrations 008–010's
+  `WITH CHECK (true)` policies were re-created in migration 012 with
+  `get_user_role() IN ('admin','teacher')`, so even a crafted direct API call is rejected by RLS.
 
 ## Deletion safety
 

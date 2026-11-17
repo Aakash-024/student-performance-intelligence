@@ -101,17 +101,20 @@ export function LoginForm({ next }: { next: string }) {
             onClick={() => fill("admin@college.edu", "Admin@123")}
             className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600 transition hover:bg-slate-200"
           >
-            Admin
+            Demo (view-only)
           </button>
           <button
             type="button"
             onClick={() => fill("teacher@college.edu", "Teacher@123")}
             className="rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600 transition hover:bg-slate-200"
           >
-            Teacher
+            Demo (view-only)
           </button>
         </div>
       </div>
+      <p className="text-center text-[11px] text-slate-400">
+        Demo accounts can browse everything but cannot change any data.
+      </p>
     </form>
   );
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -14,7 +14,7 @@ export async function createSession(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const subjectId = String(formData.get("subject_id") ?? "");
   const sectionId = String(formData.get("section_id") ?? "");
@@ -63,7 +63,7 @@ export async function saveAttendance(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const sessionId = String(formData.get("session_id") ?? "");
   if (!sessionId) return { error: "Missing session." };

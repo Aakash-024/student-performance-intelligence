@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import { Eye } from "lucide-react";
 import { cn, indicatorMeta } from "@/lib/utils";
 import type { Indicator } from "@/lib/types";
 
@@ -161,6 +162,23 @@ export function ProgressBar({ value, tone = "indigo" }: { value: number; tone?: 
         className={cn("h-full rounded-full", colors[tone])}
         style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
       />
+    </div>
+  );
+}
+
+/**
+ * Shown instead of edit forms for read-only accounts (the public demo
+ * viewers). The database also enforces this: every write policy requires the
+ * admin or teacher role, so hiding the form is UX, not the security boundary.
+ */
+export function ReadOnlyNote({ what = "editing" }: { what?: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 px-4 py-3 text-sm text-slate-500">
+      <Eye className="h-4 w-4 shrink-0 text-slate-400" />
+      <span>
+        Demo accounts have view-only access — {what} is disabled. Sign in with a staff account to
+        make changes.
+      </span>
     </div>
   );
 }

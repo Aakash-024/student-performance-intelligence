@@ -13,7 +13,8 @@ export default async function EnrollmentsPage({
 }: {
   searchParams: Promise<{ term?: string; section?: string }>;
 }) {
-  await requireUser();
+  const { profile } = await requireUser();
+  const canEdit = profile?.role === "admin" || profile?.role === "teacher";
   const params = await searchParams;
   const supabase = await createClient();
 
@@ -128,6 +129,7 @@ export default async function EnrollmentsPage({
             name: subject.name,
           }))}
           enrolled={enrolled}
+          canEdit={canEdit}
         />
       )}
     </div>

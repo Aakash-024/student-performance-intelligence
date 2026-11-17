@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { cell, columnIndex, parseCsv } from "@/lib/csv";
 import { createClient } from "@/lib/supabase/server";
 import { enrollStudentsInCurrentTerm } from "@/lib/student-enrollment";
@@ -523,7 +523,7 @@ async function buildMarks(
 
 /** Preview a students CSV. Nothing is written. */
 export async function previewStudents(_prev: PreviewState | undefined, formData: FormData): Promise<PreviewState> {
-  await requireUser();
+  await requireStaff();
   const csv = await readUpload(formData);
   const supabase = await createClient();
   const built = await buildStudents(supabase, csv);
@@ -533,7 +533,7 @@ export async function previewStudents(_prev: PreviewState | undefined, formData:
 
 /** Preview a marks CSV. Nothing is written. */
 export async function previewMarks(_prev: PreviewState | undefined, formData: FormData): Promise<PreviewState> {
-  const { user, profile } = await requireUser();
+  const { user, profile } = await requireStaff();
   const csv = await readUpload(formData);
   const supabase = await createClient();
   const built = await buildMarks(supabase, csv, user.id, profile?.role);
@@ -543,7 +543,7 @@ export async function previewMarks(_prev: PreviewState | undefined, formData: Fo
 
 /** Re-validates the CSV, then inserts/updates students and enrols them. */
 export async function commitStudents(_prev: CommitState | undefined, formData: FormData): Promise<CommitState> {
-  await requireUser();
+  await requireStaff();
   const csv = readCsv(formData);
   if (!csv) return { error: "Nothing to import. Upload a CSV first." };
 
@@ -587,7 +587,7 @@ export async function commitStudents(_prev: CommitState | undefined, formData: F
 
 /** Re-validates the CSV, then upserts marks and logs any corrections. */
 export async function commitMarks(_prev: CommitState | undefined, formData: FormData): Promise<CommitState> {
-  const { user, profile } = await requireUser();
+  const { user, profile } = await requireStaff();
   const csv = readCsv(formData);
   if (!csv) return { error: "Nothing to import. Upload a CSV first." };
 

@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { AlertCircle, CheckCircle2, Loader2, Save } from "lucide-react";
 import { saveEnrollments, type FormState } from "./actions";
 import { useRefreshOnSuccess } from "@/components/use-refresh-on-success";
+import { ReadOnlyNote } from "@/components/ui";
 
 const initial: FormState = {};
 
@@ -25,12 +26,14 @@ export function EnrollmentMatrix({
   students,
   subjects,
   enrolled,
+  canEdit = true,
 }: {
   termId: string;
   sectionId: string;
   students: MatrixStudent[];
   subjects: MatrixSubject[];
   enrolled: string[];
+  canEdit?: boolean;
 }) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(enrolled));
   const [state, action, pending] = useActionState(saveEnrollments, initial);
@@ -71,13 +74,15 @@ export function EnrollmentMatrix({
                 return (
                   <th key={subject.id} className="px-3 py-3 text-center font-medium">
                     <div className="whitespace-nowrap">{subject.code}</div>
-                    <button
-                      type="button"
-                      onClick={() => toggleColumn(subject.id)}
-                      className="mt-1 text-[10px] font-semibold normal-case tracking-normal text-indigo-600 hover:text-indigo-800"
-                    >
-                      {allOn ? "Clear all" : "Select all"}
-                    </button>
+                    {canEdit ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleColumn(subject.id)}
+                        className="mt-1 text-[10px] font-semibold normal-case tracking-normal text-indigo-600 hover:text-indigo-800"
+                      >
+                        {allOn ? "Clear all" : "Select all"}
+                      </button>
+                    ) : null}
                   </th>
                 );
               })}
@@ -100,7 +105,8 @@ export function EnrollmentMatrix({
                         value={pair}
                         checked={selected.has(pair)}
                         onChange={() => toggle(pair)}
-                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        disabled={!canEdit}
+                        className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-60"
                         aria-label={`${subject.code} for ${student.name}`}
                       />
                     </td>
@@ -113,14 +119,18 @@ export function EnrollmentMatrix({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-70"
-        >
-          {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {pending ? "Saving…" : "Save enrolments"}
-        </button>
+        {canEdit ? (
+          <button
+            type="submit"
+            disabled={pending}
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-70"
+          >
+            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {pending ? "Saving…" : "Save enrolments"}
+          </button>
+        ) : (
+          <ReadOnlyNote what="changing enrolments" />
+        )}
         <span className="text-xs text-slate-500">
           {selected.size} of {students.length * subjects.length} selections
         </span>

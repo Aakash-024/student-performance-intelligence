@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { enrollStudentsInCurrentTerm } from "@/lib/student-enrollment";
 
@@ -18,7 +18,7 @@ export async function createStudent(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const registerNumber = String(formData.get("register_number") ?? "").trim().toUpperCase();
   const name = String(formData.get("name") ?? "").trim();
@@ -86,7 +86,7 @@ export async function updateStudent(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();

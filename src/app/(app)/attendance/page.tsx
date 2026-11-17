@@ -10,7 +10,7 @@ import {
   getTerms,
 } from "@/lib/data";
 import { formatDate, formatPercent, termLabel } from "@/lib/utils";
-import { Card, EmptyState, PageHeader, ProgressBar, StatCard } from "@/components/ui";
+import { Card, EmptyState, PageHeader, ProgressBar, ReadOnlyNote, StatCard } from "@/components/ui";
 import { CreateSessionForm } from "./session-form";
 
 export const metadata = { title: "Attendance" };
@@ -24,6 +24,7 @@ export default async function AttendancePage({
   const { user, profile } = await requireUser();
   const supabase = await createClient();
   const isAdmin = profile?.role === "admin";
+  const canEdit = isAdmin || profile?.role === "teacher";
 
   const [sessions, subjects, sections, terms] = await Promise.all([
     getSessions(supabase),
@@ -41,7 +42,9 @@ export default async function AttendancePage({
   const sectionById = new Map(sections.map((section) => [section.id, section]));
 
   const visible = sessions.filter((session) => {
-    if (!isAdmin && !allowedTeacherSections.has(session.section_id)) return false;
+    // Teachers are scoped to their assigned sections; admins and demo viewers
+    // see every session (viewers read-only).
+    if (profile?.role === "teacher" && !allowedTeacherSections.has(session.section_id)) return false;
     if (params.subject && session.subject_id !== params.subject) return false;
     if (params.section && session.section_id !== params.section) return false;
     if (params.term && session.academic_term_id !== params.term) return false;
@@ -73,13 +76,17 @@ export default async function AttendancePage({
       </div>
 
       <div className="mt-5">
-        <CreateSessionForm
-          subjects={subjects}
-          sections={sections}
-          terms={terms}
-          assignments={assignments}
-          isAdmin={isAdmin}
-        />
+        {canEdit ? (
+          <CreateSessionForm
+            subjects={subjects}
+            sections={sections}
+            terms={terms}
+            assignments={assignments}
+            isAdmin={isAdmin}
+          />
+        ) : (
+          <ReadOnlyNote what="creating sessions" />
+        )}
       </div>
 
       <Card className="mt-5" bodyClassName="px-4 py-4 sm:px-5">

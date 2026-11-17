@@ -1,6 +1,6 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -14,7 +14,7 @@ export async function createAssessment(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const subjectId = String(formData.get("subject_id") ?? "");
   const termId = String(formData.get("academic_term_id") ?? "");
@@ -52,7 +52,7 @@ export async function updateAssessment(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  await requireStaff();
 
   const id = String(formData.get("id") ?? "");
   const type = String(formData.get("type") ?? "");
@@ -82,7 +82,7 @@ export async function updateAssessment(
 }
 
 export async function deleteAssessment(formData: FormData) {
-  await requireUser();
+  await requireStaff();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
@@ -94,7 +94,7 @@ export async function saveMarks(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  const { user, profile } = await requireUser();
+  const { user, profile } = await requireStaff();
   const assessmentId = String(formData.get("assessment_id") ?? "");
   if (!assessmentId) return { error: "Missing assessment." };
 
