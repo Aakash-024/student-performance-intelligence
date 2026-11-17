@@ -31,7 +31,7 @@ export default async function StudentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { profile } = await requireUser();
+  await requireUser();
   const supabase = await createClient();
 
   const detail = await getStudentDetail(supabase, id);
@@ -175,21 +175,19 @@ export default async function StudentDetailPage({
         </span>
       </div>
 
-      {profile?.role === "admin" ? (
-        <div className="mb-5 max-w-md">
-          <EditStudentForm
-            student={{
-              id: student.id,
-              name: student.name,
-              email: student.email,
-              section_id: student.section_id,
-              current_year: student.current_year,
-              status: student.status,
-            }}
-            sections={sections}
-          />
-        </div>
-      ) : null}
+      <div className="mb-5 max-w-md">
+        <EditStudentForm
+          student={{
+            id: student.id,
+            name: student.name,
+            email: student.email,
+            section_id: student.section_id,
+            current_year: student.current_year,
+            status: student.status,
+          }}
+          sections={sections}
+        />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard

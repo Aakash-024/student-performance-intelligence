@@ -1,7 +1,8 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { enrollStudentsInCurrentTerm } from "@/lib/student-enrollment";
 
 export interface FormState {
   error?: string;
@@ -17,7 +18,7 @@ export async function createStudent(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireAdmin();
+  await requireUser();
 
   const registerNumber = String(formData.get("register_number") ?? "").trim().toUpperCase();
   const name = String(formData.get("name") ?? "").trim();
@@ -66,34 +67,15 @@ export async function createStudent(
     return { error: error.message };
   }
 
-  const { data: term } = await supabase
-    .from("academic_terms")
-    .select("id")
-    .eq("is_current", true)
-    .maybeSingle();
+  const { error: enrollError } = await enrollStudentsInCurrentTerm(supabase, [
+    { id: created.id, department_id: section.department_id },
+  ]);
 
-  if (term) {
-    const { data: subjects } = await supabase
-      .from("subjects")
-      .select("id")
-      .eq("department_id", section.department_id);
-
-    if (subjects?.length) {
-      const { error: enrollError } = await supabase.from("enrollments").insert(
-        subjects.map((subject) => ({
-          student_id: created.id,
-          subject_id: subject.id,
-          academic_term_id: term.id,
-        })),
-      );
-
-      if (enrollError) {
-        // The student exists; report the partial failure instead of hiding it.
-        return {
-          error: `Student created, but enrolling them in subjects failed: ${enrollError.message}`,
-        };
-      }
-    }
+  if (enrollError) {
+    // The student exists; report the partial failure instead of hiding it.
+    return {
+      error: `Student created, but enrolling them in subjects failed: ${enrollError}`,
+    };
   }
 
   // Small state + client refresh; see assessments/actions.ts for why not redirect.
@@ -104,7 +86,7 @@ export async function updateStudent(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireAdmin();
+  await requireUser();
 
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();

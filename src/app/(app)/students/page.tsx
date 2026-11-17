@@ -40,7 +40,6 @@ export default async function StudentsPage({
   const avg = visible.length
     ? visible.reduce((sum, student) => sum + student.avg_percentage, 0) / visible.length
     : 0;
-  const isAdmin = profile?.role === "admin";
 
   return (
     <div>
@@ -49,11 +48,9 @@ export default async function StudentsPage({
         description="Every active student with current-term performance, attendance, and early-warning status."
       />
 
-      {isAdmin ? (
-        <div className="mb-5">
-          <CreateStudentForm sections={sections} />
-        </div>
-      ) : null}
+      <div className="mb-5">
+        <CreateStudentForm sections={sections} />
+      </div>
 
       <div className="mb-5 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4">
