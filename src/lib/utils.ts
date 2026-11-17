@@ -75,7 +75,6 @@ export function assessmentLabel(type: string) {
   const map: Record<string, string> = {
     cat1: "CAT 1",
     cat2: "CAT 2",
-    internal: "Internal",
     semester: "Semester exam",
   };
   return map[type] ?? type;

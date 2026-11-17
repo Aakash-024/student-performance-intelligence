@@ -55,9 +55,8 @@ SUBJECTS = [
 ]
 
 ASSESSMENTS = [
-    {"type": "cat1",     "max_marks": 50,  "weightage": 15},
-    {"type": "cat2",     "max_marks": 50,  "weightage": 15},
-    {"type": "internal", "max_marks": 100, "weightage": 20},
+    {"type": "cat1",     "max_marks": 50,  "weightage": 25},
+    {"type": "cat2",     "max_marks": 50,  "weightage": 25},
     {"type": "semester", "max_marks": 100, "weightage": 50},
 ]
 

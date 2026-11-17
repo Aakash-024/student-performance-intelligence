@@ -30,7 +30,6 @@ export const FEATURE_LABELS = {
   subjects_passed_ratio: "Subjects passed ratio",
   cat1_pct: "CAT-1 average",
   cat2_pct: "CAT-2 average",
-  internal_pct: "Internal assessment average",
   semester_pct: "Semester exam average",
   cat_trend: "CAT-1 to CAT-2 trend",
   absent_rate: "Assessment absence rate",
@@ -46,7 +45,6 @@ export interface MlFeatures {
   subjects_passed_ratio: number;
   cat1_pct: number;
   cat2_pct: number;
-  internal_pct: number;
   semester_pct: number;
   cat_trend: number;
   absent_rate: number;
@@ -103,7 +101,6 @@ export function buildFeatures(options: {
         : 0,
     cat1_pct: meanByType("cat1"),
     cat2_pct: meanByType("cat2"),
-    internal_pct: meanByType("internal"),
     semester_pct: meanByType("semester"),
     cat_trend: trends.length ? trends.reduce((sum, value) => sum + value, 0) / trends.length : 0,
     absent_rate: termMarks.length

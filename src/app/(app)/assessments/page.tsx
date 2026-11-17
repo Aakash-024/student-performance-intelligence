@@ -45,17 +45,12 @@ export default async function AssessmentsPage({
   const sectionById = new Map(sections.map((section) => [section.id, section]));
   const summaryById = new Map(summaries.map((row) => [row.assessment_id, row]));
 
+  // All signed-in staff see the full assessment catalogue: teachers configure
+  // structure, not just their own assigned classes. Marks entry remains scoped
+  // by teacher_assignments at the database level.
   const filtered = assessments.filter((assessment) => {
     if (params.term && assessment.academic_term_id !== params.term) return false;
     if (params.subject && assessment.subject_id !== params.subject) return false;
-    if (!isAdmin) {
-      const allowed = assignments.some(
-        (assignment) =>
-          assignment.subject_id === assessment.subject_id &&
-          assignment.academic_term_id === assessment.academic_term_id,
-      );
-      if (!allowed) return false;
-    }
     return true;
   });
 
@@ -100,11 +95,9 @@ export default async function AssessmentsPage({
         <StatCard label="Term" value={termLabel(currentTerm?.name ?? "—")} hint="Current academic semester" icon={Save} tone="sky" />
       </div>
 
-      {isAdmin ? (
-        <div className="mt-5">
-          <CreateAssessmentForm subjects={subjects} terms={terms} />
-        </div>
-      ) : null}
+      <div className="mt-5">
+        <CreateAssessmentForm subjects={subjects} terms={terms} />
+      </div>
 
       <Card className="mt-5" bodyClassName="px-4 py-4 sm:px-5">
         <form method="get" className="flex flex-wrap items-end gap-3">
@@ -188,11 +181,9 @@ export default async function AssessmentsPage({
                           {subject?.code ?? "—"} · {assessmentLabel(assessment.type)}
                         </p>
                         <p className="text-xs text-slate-500">{subject?.name ?? "Subject"}</p>
-                        {isAdmin ? (
-                          <div className="mt-2 max-w-xs">
-                            <EditAssessmentForm assessment={assessment} />
-                          </div>
-                        ) : null}
+                        <div className="mt-2 max-w-xs">
+                          <EditAssessmentForm assessment={assessment} />
+                        </div>
                       </td>
                       <td className="px-3 py-3 text-slate-600">
                         {termLabel(assessment.academic_terms?.name ?? "—")}

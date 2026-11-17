@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { AlertCircle, CheckCircle2, Loader2, Plus, Save } from "lucide-react";
-import { createSubject, updateSubject, type FormState } from "./actions";
+import { AlertCircle, CheckCircle2, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { createSubject, deleteSubject, updateSubject, type FormState } from "./actions";
 import { useRefreshOnSuccess } from "@/components/use-refresh-on-success";
 import type { Department, Subject } from "@/lib/types";
 
@@ -36,7 +36,7 @@ export function CreateSubjectForm({ departments }: { departments: Department[] }
         <div>
           <p className="text-sm font-semibold text-slate-900">Add a subject</p>
           <p className="text-xs text-slate-500">
-            Administrators can register a new subject for the department.
+            Register a new subject. Teachers and administrators can edit it later.
           </p>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white">
@@ -121,23 +121,49 @@ export function CreateSubjectForm({ departments }: { departments: Department[] }
   );
 }
 
-export function EditSubjectForm({ subject }: { subject: Subject }) {
+export function EditSubjectForm({
+  subject,
+  departments,
+}: {
+  subject: Subject;
+  departments: Department[];
+}) {
   const [state, action, pending] = useActionState(updateSubject, initial);
   useRefreshOnSuccess(state);
 
   return (
     <details className="rounded-xl border border-slate-200 bg-slate-50/60">
       <summary className="cursor-pointer list-none px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900">
-        Edit details
+        Edit code, name &amp; details
       </summary>
       <form action={action} className="space-y-2 border-t border-slate-200 px-3 py-3">
         <input type="hidden" name="id" value={subject.id} />
-        <input
-          name="name"
-          defaultValue={subject.name}
-          required
-          className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm outline-none focus:border-indigo-500"
-        />
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            name="code"
+            defaultValue={subject.code}
+            required
+            maxLength={12}
+            className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm uppercase outline-none focus:border-indigo-500"
+          />
+          <input
+            name="name"
+            defaultValue={subject.name}
+            required
+            className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm outline-none focus:border-indigo-500"
+          />
+        </div>
+        <select
+          name="department_id"
+          defaultValue={subject.department_id}
+          className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-indigo-500"
+        >
+          {departments.map((department) => (
+            <option key={department.id} value={department.id}>
+              {department.name}
+            </option>
+          ))}
+        </select>
         <div className="grid grid-cols-2 gap-2">
           <input
             name="credits"
@@ -167,6 +193,26 @@ export function EditSubjectForm({ subject }: { subject: Subject }) {
           Save
         </button>
       </form>
+      <DeleteSubjectForm subject={subject} />
     </details>
+  );
+}
+
+function DeleteSubjectForm({ subject }: { subject: Subject }) {
+  const [state, action, pending] = useActionState(deleteSubject, initial);
+  useRefreshOnSuccess(state);
+
+  return (
+    <form action={action} className="border-t border-slate-200 px-3 py-2">
+      <input type="hidden" name="id" value={subject.id} />
+      <Feedback state={state} />
+      <button
+        type="submit"
+        disabled={pending}
+        className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-rose-600 transition hover:bg-rose-50 disabled:opacity-70"
+      >
+        <Trash2 className="h-3.5 w-3.5" /> Delete subject
+      </button>
+    </form>
   );
 }

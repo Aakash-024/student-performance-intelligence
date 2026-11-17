@@ -10,7 +10,7 @@ import { CreateSubjectForm, EditSubjectForm } from "./subject-form";
 export const metadata = { title: "Subjects" };
 
 export default async function SubjectsPage() {
-  const { profile } = await requireUser();
+  await requireUser();
   const supabase = await createClient();
 
   const [subjects, performance, terms, departments] = await Promise.all([
@@ -20,7 +20,6 @@ export default async function SubjectsPage() {
     getDepartments(supabase),
   ]);
 
-  const isAdmin = profile?.role === "admin";
   const currentTerm = terms.find((term) => term.is_current) ?? terms[terms.length - 1];
 
   const current = performance.filter((row) => row.academic_term_id === currentTerm?.id);
@@ -68,7 +67,7 @@ export default async function SubjectsPage() {
     <div>
       <PageHeader
         title="Subjects"
-        description="Subject catalogue with live performance, pass rates, and semester history."
+        description="Subject catalogue with live performance. Teachers and administrators can change codes, names, and departments at any time."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -78,11 +77,9 @@ export default async function SubjectsPage() {
         <StatCard label="Marks recorded" value={totalMarks.toLocaleString()} hint="Current term across all subjects" icon={GraduationCap} tone="amber" />
       </div>
 
-      {isAdmin ? (
-        <div className="mt-5">
-          <CreateSubjectForm departments={departments} />
-        </div>
-      ) : null}
+      <div className="mt-5">
+        <CreateSubjectForm departments={departments} />
+      </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
         <Card title="Average vs pass rate" description={`${termLabel(currentTerm?.name ?? "Current term")} · all subjects`}>
@@ -129,11 +126,9 @@ export default async function SubjectsPage() {
               </span>
             </div>
 
-            {isAdmin ? (
-              <div className="mt-4">
-                <EditSubjectForm subject={subject} />
-              </div>
-            ) : null}
+            <div className="mt-4">
+              <EditSubjectForm subject={subject} departments={departments} />
+            </div>
           </div>
         ))}
       </div>

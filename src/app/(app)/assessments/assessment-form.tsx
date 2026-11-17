@@ -44,7 +44,7 @@ export function CreateAssessmentForm({
         <div>
           <p className="text-sm font-semibold text-slate-900">Configure an assessment</p>
           <p className="text-xs text-slate-500">
-            CAT 1, CAT 2, internal, or semester exam with configurable marks and weightage.
+            CAT 1, CAT 2, or semester exam with configurable marks and weightage.
           </p>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white">
@@ -92,7 +92,6 @@ export function CreateAssessmentForm({
             >
               <option value="cat1">CAT 1</option>
               <option value="cat2">CAT 2</option>
-              <option value="internal">Internal</option>
               <option value="semester">Semester exam</option>
             </select>
           </label>
@@ -152,7 +151,9 @@ export function EditAssessmentForm({ assessment }: { assessment: Assessment }) {
   const router = useRouter();
 
   // Deleting returns no state; refresh explicitly so the list drops the row.
+  // Marks and audit rows cascade with the assessment, so warn first.
   async function handleDelete(formData: FormData) {
+    if (!window.confirm("Delete this assessment and all marks recorded for it?")) return;
     await deleteAssessment(formData);
     router.refresh();
   }
@@ -164,6 +165,18 @@ export function EditAssessmentForm({ assessment }: { assessment: Assessment }) {
       </summary>
       <form action={action} className="space-y-2 border-t border-slate-200 px-3 py-3">
         <input type="hidden" name="id" value={assessment.id} />
+        <label className="block text-xs">
+          <span className="mb-1 block text-slate-500">Type</span>
+          <select
+            name="type"
+            defaultValue={assessment.type}
+            className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-indigo-500"
+          >
+            <option value="cat1">CAT 1</option>
+            <option value="cat2">CAT 2</option>
+            <option value="semester">Semester exam</option>
+          </select>
+        </label>
         <div className="grid grid-cols-2 gap-2">
           <label className="text-xs">
             <span className="mb-1 block text-slate-500">Max marks</span>

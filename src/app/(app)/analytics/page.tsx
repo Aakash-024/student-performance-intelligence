@@ -100,7 +100,7 @@ export default async function AnalyticsPage({
   });
 
   // Assessment-type comparison for the selected term.
-  const typeRows = ["cat1", "cat2", "internal", "semester"].map((type) => {
+  const typeRows = ["cat1", "cat2", "semester"].map((type) => {
     const list = assessments.filter(
       (assessment) =>
         assessment.type === type &&
