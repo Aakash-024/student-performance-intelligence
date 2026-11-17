@@ -13,6 +13,8 @@ work so the tradeoffs are visible to whoever maintains the project next.
 | Assessments | Add / edit / delete CAT 1, CAT 2, Semester exam; edit type, max marks, weightage, date | Teachers + admins |
 | Marks | Enter / correct marks at any time | Teachers (assigned sections) + admins |
 | Mark corrections | Append-only before/after audit trail | Visible to the editor and admins |
+| Students | Create and edit student records | Teachers + admins |
+| CSV import | Two-step upload of students and marks with per-row validation | Teachers + admins |
 
 The generic `internal` assessment type was removed entirely. The two internal
 exams are now `cat1` ("CAT 1") and `cat2` ("CAT 2"), matching how the college
@@ -57,6 +59,9 @@ them. Admins remain unrestricted.
 - **010** placeholder `internal` assessments deleted; type check narrowed to
   `cat1`/`cat2`/`semester`; demo weightage redistributed to 25/25/50 so totals
   stay at 100; staff write + delete policies for assessments.
+- **011** `students_insert_admin`/`students_update_admin` replaced with staff
+  policies so teachers can create and edit students (needed for CSV import).
+  Student **delete** stays admin-only.
 
 All four were applied with:
 
@@ -87,3 +92,34 @@ by a retrain. The two files are deliberately kept in lockstep.
   enrolments; the database also has `ON DELETE RESTRICT` on enrolments.
 - Deleting a **term** is blocked by the database if assessments, attendance, or
   enrolments reference it; the app shows a friendly error on the FK violation.
+
+## CSV import (`/import`)
+
+Two-step upload, open to all staff:
+
+1. **Validate** — the file is parsed and every row is checked against the live
+   catalogue. Nothing is written. The preview labels each row `ready` (new),
+   `update` (already exists), `skipped`, or `error` with the reason.
+2. **Import** — the file is re-validated server-side (the preview is display
+   only, never trusted) and only rows without errors are written. If a large
+   batch fails part-way, earlier chunks stay committed; re-running the same
+   file is safe because imports upsert instead of blindly inserting.
+
+**Students CSV** — columns `register_number, name, email, section,
+current_year, status` (only register_number, name, section and current_year
+are required; `section_id` UUIDs and a `department` column are also accepted
+for disambiguation). New students are auto-enrolled in the current term's
+subjects for their department, same as the single-student form. Sections must
+already exist — there is no section editor, so an admin adds new sections.
+
+**Marks CSV** — columns `register_number, subject_code, term, assessment,
+marks_obtained, is_absent` (`student_id` and `assessment_id` UUIDs are also
+accepted, which is what `data/generated/marks.csv` uses). Assessment must be
+`CAT 1`, `CAT 2` or `Semester`. Teachers can only import marks for their
+`teacher_assignments` rows; unassigned rows are skipped, not failed. Existing
+marks that change value become `mark_audit` corrections, exactly like manual
+edits.
+
+Limits: 2000 rows per file, server-action body limit raised to 4MB in
+`next.config.ts`. Templates are downloadable from the Import page
+(`/api/import/template?type=students|marks`, login required).

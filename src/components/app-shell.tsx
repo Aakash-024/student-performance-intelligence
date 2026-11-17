@@ -9,6 +9,7 @@ import {
   CalendarCheck,
   CalendarDays,
   ClipboardList,
+  FileUp,
   GraduationCap,
   LayoutDashboard,
   ListChecks,
@@ -25,6 +26,7 @@ import type { Profile } from "@/lib/types";
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/students", label: "Students", icon: Users },
+  { href: "/import", label: "Import", icon: FileUp },
   { href: "/terms", label: "Terms", icon: CalendarDays },
   { href: "/subjects", label: "Subjects", icon: BookOpen },
   { href: "/enrollments", label: "Enrolments", icon: ListChecks },
