@@ -1,6 +1,7 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
+import { logActivity } from "@/lib/activity";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -17,7 +18,7 @@ export async function saveEnrollments(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
 
   const termId = String(formData.get("term_id") ?? "").trim();
   const sectionId = String(formData.get("section_id") ?? "").trim();
@@ -72,6 +73,22 @@ export async function saveEnrollments(
       .upsert(toInsert, { onConflict: "student_id,subject_id,academic_term_id" });
     if (error) return { error: error.message };
   }
+
+  const [{ data: section }, { data: term }] = await Promise.all([
+    supabase.from("sections").select("name").eq("id", sectionId).maybeSingle(),
+    supabase.from("academic_terms").select("name").eq("id", termId).maybeSingle(),
+  ]);
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "enrollment.bulk",
+    entityType: "enrollment",
+    entityId: `${sectionId}|${termId}`,
+    entityLabel: `Section ${section?.name ?? "—"} · ${term?.name ?? "—"}`,
+    summary: `Updated enrolments — ${toInsert.length} added, ${toDelete.length} removed.`,
+    details: { added: toInsert.length, removed: toDelete.length, term_id: termId, section_id: sectionId },
+  });
 
   return {
     success: `Enrolments updated — ${toInsert.length} added, ${toDelete.length} removed.`,

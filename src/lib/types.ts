@@ -1,4 +1,4 @@
-export type Role = "admin" | "teacher";
+export type Role = "admin" | "teacher" | "viewer";
 
 export type Indicator =
   | "at_risk"

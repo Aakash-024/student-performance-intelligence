@@ -1,12 +1,12 @@
 import { FileUp, ShieldCheck } from "lucide-react";
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
 import { Card, PageHeader } from "@/components/ui";
 import { ImportForm } from "./import-form";
 
 export const metadata = { title: "Import" };
 
 export default async function ImportPage() {
-  await requireUser();
+  await requireStaff();
 
   return (
     <div>

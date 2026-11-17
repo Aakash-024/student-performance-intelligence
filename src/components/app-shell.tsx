@@ -9,13 +9,16 @@ import {
   CalendarCheck,
   CalendarDays,
   ClipboardList,
+  Eye,
   FileUp,
   GraduationCap,
+  History,
   LayoutDashboard,
   ListChecks,
   LogOut,
   Menu,
   ShieldCheck,
+  UserCog,
   Users,
   X,
 } from "lucide-react";
@@ -26,22 +29,29 @@ import type { Profile } from "@/lib/types";
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/students", label: "Students", icon: Users },
-  { href: "/import", label: "Import", icon: FileUp },
+  { href: "/import", label: "Import", icon: FileUp, staffOnly: true },
   { href: "/terms", label: "Terms", icon: CalendarDays },
   { href: "/subjects", label: "Subjects", icon: BookOpen },
   { href: "/enrollments", label: "Enrolments", icon: ListChecks },
   { href: "/assessments", label: "Assessments", icon: ClipboardList },
   { href: "/attendance", label: "Attendance", icon: CalendarCheck },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/activity", label: "Activity", icon: History, staffOnly: true },
   { href: "/teachers", label: "Teachers", icon: GraduationCap, adminOnly: true },
+  { href: "/accounts", label: "Accounts", icon: UserCog, adminOnly: true },
 ];
 
 function NavLinks({ profile, onNavigate }: { profile: Profile; onNavigate?: () => void }) {
   const pathname = usePathname();
+  const isStaff = profile.role === "admin" || profile.role === "teacher";
   return (
     <nav className="space-y-1">
       {nav
-        .filter((item) => !item.adminOnly || profile.role === "admin")
+        .filter(
+          (item) =>
+            (!item.adminOnly || profile.role === "admin") &&
+            (!item.staffOnly || isStaff),
+        )
         .map(({ href, label, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           return (
@@ -96,10 +106,16 @@ function UserCard({ profile }: { profile: Profile }) {
           <p className="flex items-center gap-1 truncate text-[11px] text-slate-400">
             {profile.role === "admin" ? (
               <ShieldCheck className="h-3 w-3 text-indigo-300" />
-            ) : (
+            ) : profile.role === "teacher" ? (
               <GraduationCap className="h-3 w-3 text-emerald-300" />
+            ) : (
+              <Eye className="h-3 w-3 text-amber-300" />
             )}
-            {profile.role === "admin" ? "Administrator" : "Teacher"}
+            {profile.role === "admin"
+              ? "Administrator"
+              : profile.role === "teacher"
+                ? "Teacher"
+                : "Demo · view-only"}
           </p>
         </div>
       </div>
@@ -183,6 +199,12 @@ export function AppShell({
       ) : null}
 
       <main className="lg:pl-64">
+        {profile.role === "viewer" ? (
+          <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-center text-xs font-medium text-amber-800 lg:px-8">
+            <Eye className="mr-1.5 inline h-3.5 w-3.5" />
+            Demo account — everything here is read-only. Sign in with a staff account to make changes.
+          </div>
+        ) : null}
         <div className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           {children}
         </div>

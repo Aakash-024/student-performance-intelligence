@@ -12,7 +12,7 @@ import {
   getTerms,
 } from "@/lib/data";
 import { assessmentLabel, formatDate, formatPercent, termLabel } from "@/lib/utils";
-import { Card, EmptyState, PageHeader, ProgressBar, StatCard } from "@/components/ui";
+import { Card, EmptyState, PageHeader, ProgressBar, ReadOnlyNote, StatCard } from "@/components/ui";
 import { CreateAssessmentForm, EditAssessmentForm } from "./assessment-form";
 
 export const metadata = { title: "Assessments" };
@@ -26,6 +26,7 @@ export default async function AssessmentsPage({
   const { user, profile } = await requireUser();
   const supabase = await createClient();
   const isAdmin = profile?.role === "admin";
+  const canEdit = isAdmin || profile?.role === "teacher";
 
   const [terms, subjects, sections, assessments, summaries, students] = await Promise.all([
     getTerms(supabase),
@@ -55,7 +56,7 @@ export default async function AssessmentsPage({
   });
 
   function expectedCount(subjectId: string, termId: string) {
-    if (isAdmin) return students.length;
+    if (isAdmin || !canEdit) return students.length;
     const allowedSections = new Set(
       assignments
         .filter((a) => a.subject_id === subjectId && a.academic_term_id === termId)
@@ -96,7 +97,7 @@ export default async function AssessmentsPage({
       </div>
 
       <div className="mt-5">
-        <CreateAssessmentForm subjects={subjects} terms={terms} />
+        {canEdit ? <CreateAssessmentForm subjects={subjects} terms={terms} /> : <ReadOnlyNote what="adding assessments" />}
       </div>
 
       <Card className="mt-5" bodyClassName="px-4 py-4 sm:px-5">
@@ -182,7 +183,7 @@ export default async function AssessmentsPage({
                         </p>
                         <p className="text-xs text-slate-500">{subject?.name ?? "Subject"}</p>
                         <div className="mt-2 max-w-xs">
-                          <EditAssessmentForm assessment={assessment} />
+                          {canEdit ? <EditAssessmentForm assessment={assessment} /> : null}
                         </div>
                       </td>
                       <td className="px-3 py-3 text-slate-600">
@@ -235,7 +236,7 @@ export default async function AssessmentsPage({
         )}
       </div>
       <p className="mt-3 text-xs text-slate-500">
-        {isAdmin
+        {isAdmin || !canEdit
           ? `Coverage is measured against all ${students.length} active students.`
           : `Coverage is measured against students in your assigned sections (${sections.filter((s) => assignments.some((a) => a.section_id === s.id)).length} sections).`}
       </p>

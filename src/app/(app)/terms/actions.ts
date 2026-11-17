@@ -1,6 +1,7 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
+import { diffChanges, logActivity } from "@/lib/activity";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -57,7 +58,7 @@ export async function createTerm(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
   const input = readInput(formData);
   const problem = validate(input);
   if (problem) return { error: problem };
@@ -81,6 +82,17 @@ export async function createTerm(
     return { error: error.message };
   }
 
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "term.create",
+    entityType: "term",
+    entityLabel: input.name,
+    summary: `Created term — ${input.year}, semester ${input.semester}${input.isCurrent ? " (set as current)" : ""}.`,
+    details: { ...input },
+  });
+
   return { success: `${input.name} created.` };
 }
 
@@ -88,7 +100,7 @@ export async function updateTerm(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
   const input = readInput(formData);
   if (!input.id) return { error: "Missing term." };
   const problem = validate(input);
@@ -96,6 +108,12 @@ export async function updateTerm(
 
   const supabase = await createClient();
   if (input.isCurrent) await clearCurrent(supabase, input.id);
+
+  const { data: before } = await supabase
+    .from("academic_terms")
+    .select("name, year, semester, start_date, end_date, is_current")
+    .eq("id", input.id)
+    .maybeSingle();
 
   const { error } = await supabase
     .from("academic_terms")
@@ -116,6 +134,40 @@ export async function updateTerm(
     return { error: error.message };
   }
 
+  const changes = before
+    ? diffChanges(
+        {
+          name: before.name,
+          year: before.year,
+          semester: before.semester,
+          start_date: before.start_date,
+          end_date: before.end_date,
+          is_current: before.is_current,
+        },
+        {
+          name: input.name,
+          year: input.year,
+          semester: input.semester,
+          start_date: input.startDate,
+          end_date: input.endDate,
+          is_current: input.isCurrent,
+        },
+      )
+    : {};
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "term.update",
+    entityType: "term",
+    entityId: input.id,
+    entityLabel: input.name,
+    summary: Object.keys(changes).length
+      ? `Edited term — changed ${Object.keys(changes).join(", ")}.`
+      : "Edited term.",
+    details: { changes },
+  });
+
   return { success: "Term updated." };
 }
 
@@ -123,11 +175,17 @@ export async function deleteTerm(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
   const id = String(formData.get("id") ?? "").trim();
   if (!id) return { error: "Missing term." };
 
   const supabase = await createClient();
+  const { data: before } = await supabase
+    .from("academic_terms")
+    .select("name")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase.from("academic_terms").delete().eq("id", id);
 
   if (error) {
@@ -136,6 +194,18 @@ export async function deleteTerm(
     }
     return { error: error.message };
   }
+
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "term.delete",
+    entityType: "term",
+    entityId: id,
+    entityLabel: before?.name ?? id,
+    summary: `Deleted term ${before?.name ?? id}.`,
+    details: null,
+  });
 
   return { success: "Term deleted." };
 }

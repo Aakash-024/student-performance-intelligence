@@ -1,6 +1,7 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
+import { logActivity } from "@/lib/activity";
 import { cell, columnIndex, parseCsv } from "@/lib/csv";
 import { createClient } from "@/lib/supabase/server";
 import { enrollStudentsInCurrentTerm } from "@/lib/student-enrollment";
@@ -523,7 +524,7 @@ async function buildMarks(
 
 /** Preview a students CSV. Nothing is written. */
 export async function previewStudents(_prev: PreviewState | undefined, formData: FormData): Promise<PreviewState> {
-  await requireUser();
+  await requireStaff();
   const csv = await readUpload(formData);
   const supabase = await createClient();
   const built = await buildStudents(supabase, csv);
@@ -533,7 +534,7 @@ export async function previewStudents(_prev: PreviewState | undefined, formData:
 
 /** Preview a marks CSV. Nothing is written. */
 export async function previewMarks(_prev: PreviewState | undefined, formData: FormData): Promise<PreviewState> {
-  const { user, profile } = await requireUser();
+  const { user, profile } = await requireStaff();
   const csv = await readUpload(formData);
   const supabase = await createClient();
   const built = await buildMarks(supabase, csv, user.id, profile?.role);
@@ -543,7 +544,7 @@ export async function previewMarks(_prev: PreviewState | undefined, formData: Fo
 
 /** Re-validates the CSV, then inserts/updates students and enrols them. */
 export async function commitStudents(_prev: CommitState | undefined, formData: FormData): Promise<CommitState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
   const csv = readCsv(formData);
   if (!csv) return { error: "Nothing to import. Upload a CSV first." };
 
@@ -580,6 +581,18 @@ export async function commitStudents(_prev: CommitState | undefined, formData: F
 
   const created = built.rows.filter((row) => row.view.status === "ready").length;
   const updated = built.rows.filter((row) => row.view.status === "update").length;
+
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "import.students",
+    entityType: "import",
+    entityLabel: `${records.length} students`,
+    summary: `CSV import — ${created} new student${created === 1 ? "" : "s"}, ${updated} updated, ${enrolments.enrolled} enrolment${enrolments.enrolled === 1 ? "" : "s"} added.`,
+    details: { created, updated, enrolments: enrolments.enrolled },
+  });
+
   return {
     success: `Imported ${created} new student${created === 1 ? "" : "s"}, updated ${updated}. Added ${enrolments.enrolled} current-term enrolment${enrolments.enrolled === 1 ? "" : "s"}.`,
   };
@@ -587,7 +600,7 @@ export async function commitStudents(_prev: CommitState | undefined, formData: F
 
 /** Re-validates the CSV, then upserts marks and logs any corrections. */
 export async function commitMarks(_prev: CommitState | undefined, formData: FormData): Promise<CommitState> {
-  const { user, profile } = await requireUser();
+  const { user, profile } = await requireStaff();
   const csv = readCsv(formData);
   if (!csv) return { error: "Nothing to import. Upload a CSV first." };
 
@@ -656,6 +669,18 @@ export async function commitMarks(_prev: CommitState | undefined, formData: Form
   ).length;
   const corrected = records.length - added;
   const skipped = built.rows.filter((row) => row.view.status === "skipped").length;
+
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "import.marks",
+    entityType: "import",
+    entityLabel: `${records.length} marks`,
+    summary: `CSV import — ${added} new mark${added === 1 ? "" : "s"}, ${corrected} corrected${skipped ? `, ${skipped} skipped (not assigned)` : ""}.`,
+    details: { added, corrected, skipped },
+  });
+
   return {
     success: `Imported ${added} mark${added === 1 ? "" : "s"}, corrected ${corrected}${skipped ? `, skipped ${skipped} unassigned` : ""}.`,
   };

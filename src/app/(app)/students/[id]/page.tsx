@@ -31,7 +31,7 @@ export default async function StudentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  await requireUser();
+  const { profile } = await requireUser();
   const supabase = await createClient();
 
   const detail = await getStudentDetail(supabase, id);
@@ -120,6 +120,7 @@ export default async function StudentDetailPage({
     termName: currentTerm?.name ?? "",
   });
   const prediction = predict(mlFeatures);
+  const canEdit = profile?.role === "admin" || profile?.role === "teacher";
 
   const reportData = {
     name: student.name,
@@ -176,17 +177,19 @@ export default async function StudentDetailPage({
       </div>
 
       <div className="mb-5 max-w-md">
-        <EditStudentForm
-          student={{
-            id: student.id,
-            name: student.name,
-            email: student.email,
-            section_id: student.section_id,
-            current_year: student.current_year,
-            status: student.status,
-          }}
-          sections={sections}
-        />
+        {canEdit ? (
+          <EditStudentForm
+            student={{
+              id: student.id,
+              name: student.name,
+              email: student.email,
+              section_id: student.section_id,
+              current_year: student.current_year,
+              status: student.status,
+            }}
+            sections={sections}
+          />
+        ) : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

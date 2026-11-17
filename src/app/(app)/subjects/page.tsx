@@ -3,14 +3,15 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getDepartments, getSubjectPerformance, getSubjects, getTerms } from "@/lib/data";
 import { formatPercent, termLabel } from "@/lib/utils";
-import { Card, PageHeader, ProgressBar, StatCard } from "@/components/ui";
+import { Card, PageHeader, ProgressBar, ReadOnlyNote, StatCard } from "@/components/ui";
 import { SubjectBarChart, TermTrendChart } from "@/components/charts";
 import { CreateSubjectForm, EditSubjectForm } from "./subject-form";
 
 export const metadata = { title: "Subjects" };
 
 export default async function SubjectsPage() {
-  await requireUser();
+  const { profile } = await requireUser();
+  const canEdit = profile?.role === "admin" || profile?.role === "teacher";
   const supabase = await createClient();
 
   const [subjects, performance, terms, departments] = await Promise.all([
@@ -77,9 +78,7 @@ export default async function SubjectsPage() {
         <StatCard label="Marks recorded" value={totalMarks.toLocaleString()} hint="Current term across all subjects" icon={GraduationCap} tone="amber" />
       </div>
 
-      <div className="mt-5">
-        <CreateSubjectForm departments={departments} />
-      </div>
+      <div className="mt-5">{canEdit ? <CreateSubjectForm departments={departments} /> : <ReadOnlyNote what="editing subjects" />}</div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
         <Card title="Average vs pass rate" description={`${termLabel(currentTerm?.name ?? "Current term")} · all subjects`}>
@@ -127,7 +126,7 @@ export default async function SubjectsPage() {
             </div>
 
             <div className="mt-4">
-              <EditSubjectForm subject={subject} departments={departments} />
+              {canEdit ? <EditSubjectForm subject={subject} departments={departments} /> : null}
             </div>
           </div>
         ))}

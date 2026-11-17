@@ -5,7 +5,7 @@ import { getSections, getStudentOverview, getTeacherContext } from "@/lib/data";
 import { requireUser } from "@/lib/auth";
 import type { Indicator } from "@/lib/types";
 import { formatPercent, INDICATOR_ORDER, indicatorMeta } from "@/lib/utils";
-import { Card, EmptyState, IndicatorBadge, PageHeader, ProgressBar } from "@/components/ui";
+import { Card, EmptyState, IndicatorBadge, PageHeader, ProgressBar, ReadOnlyNote } from "@/components/ui";
 import { CreateStudentForm } from "./student-form";
 
 export const metadata = { title: "Students" };
@@ -41,6 +41,8 @@ export default async function StudentsPage({
     ? visible.reduce((sum, student) => sum + student.avg_percentage, 0) / visible.length
     : 0;
 
+  const canEdit = profile?.role === "admin" || profile?.role === "teacher";
+
   return (
     <div>
       <PageHeader
@@ -48,9 +50,7 @@ export default async function StudentsPage({
         description="Every active student with current-term performance, attendance, and early-warning status."
       />
 
-      <div className="mb-5">
-        <CreateStudentForm sections={sections} />
-      </div>
+      <div className="mb-5">{canEdit ? <CreateStudentForm sections={sections} /> : <ReadOnlyNote what="adding students" />}</div>
 
       <div className="mb-5 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4">

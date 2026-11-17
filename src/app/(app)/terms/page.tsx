@@ -3,13 +3,14 @@ import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getTerms } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
-import { Card, PageHeader, StatCard } from "@/components/ui";
+import { Card, PageHeader, ReadOnlyNote, StatCard } from "@/components/ui";
 import { CreateTermForm, DeleteTermForm, EditTermForm } from "./term-form";
 
 export const metadata = { title: "Academic terms" };
 
 export default async function TermsPage() {
-  await requireUser();
+  const { profile } = await requireUser();
+  const canEdit = profile?.role === "admin" || profile?.role === "teacher";
   const supabase = await createClient();
   const terms = await getTerms(supabase);
 
@@ -31,9 +32,7 @@ export default async function TermsPage() {
         <StatCard label="Enrolment target" value={current ? current.year : "—"} hint="Used when new students are added" icon={MapPin} tone="amber" />
       </div>
 
-      <div className="mt-5">
-        <CreateTermForm />
-      </div>
+      <div className="mt-5">{canEdit ? <CreateTermForm /> : <ReadOnlyNote what="changing terms" />}</div>
 
       <Card
         title="Configured terms"
@@ -66,8 +65,12 @@ export default async function TermsPage() {
                   </span>
                 </div>
                 <div className="mt-3">
-                  <EditTermForm term={term} />
-                  <DeleteTermForm term={term} />
+                  {canEdit ? (
+                    <>
+                      <EditTermForm term={term} />
+                      <DeleteTermForm term={term} />
+                    </>
+                  ) : null}
                 </div>
               </div>
             ))}

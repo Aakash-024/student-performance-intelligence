@@ -1,6 +1,7 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
+import { logActivity } from "@/lib/activity";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -14,7 +15,7 @@ export async function createAssessment(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
 
   const subjectId = String(formData.get("subject_id") ?? "");
   const termId = String(formData.get("academic_term_id") ?? "");
@@ -29,14 +30,18 @@ export async function createAssessment(
   if (!(weightage >= 0 && weightage <= 100)) return { error: "Weightage must be between 0 and 100." };
 
   const supabase = await createClient();
-  const { error } = await supabase.from("assessments").insert({
-    subject_id: subjectId,
-    academic_term_id: termId,
-    type,
-    max_marks: maxMarks,
-    weightage_percent: weightage,
-    date: date || null,
-  });
+  const { data: created, error } = await supabase
+    .from("assessments")
+    .insert({
+      subject_id: subjectId,
+      academic_term_id: termId,
+      type,
+      max_marks: maxMarks,
+      weightage_percent: weightage,
+      date: date || null,
+    })
+    .select("id, subjects(code), academic_terms(name)")
+    .maybeSingle();
 
   if (error) {
     if (error.code === "23505") {
@@ -45,6 +50,20 @@ export async function createAssessment(
     return { error: error.message };
   }
 
+  const subjectCode = (created?.subjects as { code?: string } | null)?.code ?? subjectId;
+  const termName = (created?.academic_terms as { name?: string } | null)?.name ?? termId;
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "assessment.create",
+    entityType: "assessment",
+    entityId: created?.id ?? null,
+    entityLabel: `${subjectCode} · ${termName} · ${type.toUpperCase()}`,
+    summary: `Created ${type.toUpperCase()} assessment for ${subjectCode} (${termName}) — max ${maxMarks}, weight ${weightage}%.`,
+    details: { subject_id: subjectId, academic_term_id: termId, type, max_marks: maxMarks, weightage_percent: weightage, date: date || null },
+  });
+
   return { success: "Assessment created." };
 }
 
@@ -52,7 +71,7 @@ export async function updateAssessment(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
 
   const id = String(formData.get("id") ?? "");
   const type = String(formData.get("type") ?? "");
@@ -66,6 +85,13 @@ export async function updateAssessment(
   if (!(weightage >= 0 && weightage <= 100)) return { error: "Weightage must be between 0 and 100." };
 
   const supabase = await createClient();
+
+  const { data: before } = await supabase
+    .from("assessments")
+    .select("type, max_marks, weightage_percent, date, subjects(code), academic_terms(name)")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("assessments")
     .update({ type, max_marks: maxMarks, weightage_percent: weightage, date: date || null })
@@ -78,30 +104,73 @@ export async function updateAssessment(
     return { error: error.message };
   }
 
+  const subjectCode = (before?.subjects as { code?: string } | null)?.code ?? id;
+  const termName = (before?.academic_terms as { name?: string } | null)?.name ?? "";
+  const changes: Record<string, [unknown, unknown]> = {};
+  if (before) {
+    if (before.type !== type) changes.type = [before.type, type];
+    if (Number(before.max_marks) !== maxMarks) changes.max_marks = [before.max_marks, maxMarks];
+    if (Number(before.weightage_percent) !== weightage) changes.weightage_percent = [before.weightage_percent, weightage];
+    if ((before.date ?? null) !== (date || null)) changes.date = [before.date, date || null];
+  }
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "assessment.update",
+    entityType: "assessment",
+    entityId: id,
+    entityLabel: `${subjectCode} · ${termName} · ${type.toUpperCase()}`,
+    summary: Object.keys(changes).length
+      ? `Edited assessment — changed ${Object.keys(changes).join(", ")}.`
+      : "Edited assessment.",
+    details: { changes },
+  });
+
   return { success: "Assessment updated." };
 }
 
 export async function deleteAssessment(formData: FormData) {
-  await requireUser();
+  const { user, profile } = await requireStaff();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
   const supabase = await createClient();
+  const { data: before } = await supabase
+    .from("assessments")
+    .select("type, subjects(code), academic_terms(name)")
+    .eq("id", id)
+    .maybeSingle();
+
   await supabase.from("assessments").delete().eq("id", id);
+
+  const subjectCode = (before?.subjects as { code?: string } | null)?.code ?? id;
+  const termName = (before?.academic_terms as { name?: string } | null)?.name ?? "";
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "assessment.delete",
+    entityType: "assessment",
+    entityId: id,
+    entityLabel: `${subjectCode} · ${termName} · ${(before?.type ?? "?").toUpperCase()}`,
+    summary: `Deleted the ${String(before?.type ?? "").toUpperCase()} assessment for ${subjectCode} (${termName}) and all of its marks.`,
+    details: null,
+  });
 }
 
 export async function saveMarks(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  const { user, profile } = await requireUser();
+  const { user, profile } = await requireStaff();
   const assessmentId = String(formData.get("assessment_id") ?? "");
   if (!assessmentId) return { error: "Missing assessment." };
 
   const supabase = await createClient();
   const { data: assessment } = await supabase
     .from("assessments")
-    .select("id, max_marks, subject_id")
+    .select("id, max_marks, subject_id, subjects(code), academic_terms(name)")
     .eq("id", assessmentId)
     .maybeSingle();
 
@@ -197,6 +266,20 @@ export async function saveMarks(
     const { error: auditError } = await supabase.from("mark_audit").insert(corrections);
     if (auditError) console.error("[audit] failed to log mark corrections:", auditError.message);
   }
+
+  const subjectCode = (assessment.subjects as { code?: string } | null)?.code ?? assessment.subject_id;
+  const termName = (assessment.academic_terms as { name?: string } | null)?.name ?? "";
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "marks.save",
+    entityType: "marks",
+    entityId: assessmentId,
+    entityLabel: `${subjectCode} · ${termName}`,
+    summary: `Saved ${entries.length} mark${entries.length === 1 ? "" : "s"} for ${subjectCode} (${termName})${corrections.length ? ` — ${corrections.length} correction${corrections.length === 1 ? "" : "s"} audited` : ""}.`,
+    details: { saved: entries.length, corrections: corrections.length },
+  });
 
   // NOTE: return a small state object and let the client refresh.
   // On production builds, action responses that carry revalidatePath re-renders

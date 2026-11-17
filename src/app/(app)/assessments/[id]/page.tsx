@@ -43,9 +43,11 @@ export default async function AssessmentDetailPage({
     profile?.role === "teacher" ? await getTeacherContext(supabase, user.id) : null;
   const assignments = teacherCtx?.assignments ?? [];
   const isAdmin = profile?.role === "admin";
+  const isStaff = isAdmin || profile?.role === "teacher";
 
-  // A teacher sees only sections they are assigned for this subject + term.
-  const allowedSectionIds = isAdmin
+  // Teachers see only sections they are assigned for this subject + term.
+  // Viewers (demo accounts) see every section but cannot edit.
+  const allowedSectionIds = !isStaff || isAdmin
     ? new Set(sections.map((section) => section.id))
     : new Set(
         assignments
@@ -57,7 +59,7 @@ export default async function AssessmentDetailPage({
           .map((assignment) => assignment.section_id),
       );
 
-  const editable = isAdmin || allowedSectionIds.size > 0;
+  const editable = isStaff && (isAdmin || allowedSectionIds.size > 0);
   const scopedStudents = students.filter((student) => allowedSectionIds.has(student.section_id));
   const sectionById = new Map(sections.map((section) => [section.id, section]));
 
@@ -108,7 +110,7 @@ export default async function AssessmentDetailPage({
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Students in scope" value={scopedStudents.length} hint={isAdmin ? "All active students" : "Your assigned sections"} icon={Users} tone="indigo" />
+        <StatCard label="Students in scope" value={scopedStudents.length} hint={isAdmin || !isStaff ? "All active students" : "Your assigned sections"} icon={Users} tone="indigo" />
         <StatCard label="Marks recorded" value={recorded} hint={missing > 0 ? `${missing} missing` : "Complete"} icon={ClipboardList} tone={missing ? "amber" : "emerald"} />
         <StatCard label="Average" value={formatPercent(summary?.avg_percentage ?? 0)} hint="Weighted score for this assessment" icon={Percent} tone="sky" />
         <StatCard label="Exam date" value={formatDate(assessment.date)} hint={termLabel(assessment.academic_terms?.name ?? "Term")} icon={CalendarDays} tone="slate" />

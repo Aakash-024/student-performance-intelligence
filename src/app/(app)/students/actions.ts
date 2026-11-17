@@ -1,6 +1,7 @@
 "use server";
 
-import { requireUser } from "@/lib/auth";
+import { requireStaff } from "@/lib/auth";
+import { diffChanges, logActivity } from "@/lib/activity";
 import { createClient } from "@/lib/supabase/server";
 import { enrollStudentsInCurrentTerm } from "@/lib/student-enrollment";
 
@@ -18,7 +19,7 @@ export async function createStudent(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
 
   const registerNumber = String(formData.get("register_number") ?? "").trim().toUpperCase();
   const name = String(formData.get("name") ?? "").trim();
@@ -78,6 +79,18 @@ export async function createStudent(
     };
   }
 
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "student.create",
+    entityType: "student",
+    entityId: created.id,
+    entityLabel: `${name} (${registerNumber})`,
+    summary: `Added student and enrolled them in the current term's subjects.`,
+    details: { register_number: registerNumber, section_id: sectionId, current_year: currentYear, email: email || null },
+  });
+
   // Small state + client refresh; see assessments/actions.ts for why not redirect.
   return { success: `${name} (${registerNumber}) added and enrolled in the current term.` };
 }
@@ -86,7 +99,7 @@ export async function updateStudent(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireUser();
+  const { user, profile } = await requireStaff();
 
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
@@ -108,6 +121,12 @@ export async function updateStudent(
   }
 
   const supabase = await createClient();
+  const { data: before } = await supabase
+    .from("students")
+    .select("name, email, section_id, current_year, status")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase
     .from("students")
     .update({
@@ -121,6 +140,32 @@ export async function updateStudent(
     .eq("id", id);
 
   if (error) return { error: error.message };
+
+  const changes = before
+    ? diffChanges(
+        {
+          name: before.name,
+          email: before.email,
+          section_id: before.section_id,
+          current_year: before.current_year,
+          status: before.status,
+        },
+        { name, email: email || null, section_id: sectionId, current_year: currentYear, status },
+      )
+    : {};
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "student.update",
+    entityType: "student",
+    entityId: id,
+    entityLabel: `${name}`,
+    summary: Object.keys(changes).length
+      ? `Edited student record — changed ${Object.keys(changes).join(", ")}.`
+      : "Edited student record.",
+    details: { changes },
+  });
 
   return { success: "Student record updated." };
 }
