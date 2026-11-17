@@ -7,6 +7,7 @@ import {
   BarChart3,
   BookOpen,
   CalendarCheck,
+  CalendarDays,
   ClipboardList,
   GraduationCap,
   LayoutDashboard,
@@ -23,6 +24,7 @@ import type { Profile } from "@/lib/types";
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/students", label: "Students", icon: Users },
+  { href: "/terms", label: "Terms", icon: CalendarDays },
   { href: "/subjects", label: "Subjects", icon: BookOpen },
   { href: "/assessments", label: "Assessments", icon: ClipboardList },
   { href: "/attendance", label: "Attendance", icon: CalendarCheck },
