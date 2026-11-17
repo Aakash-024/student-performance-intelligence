@@ -1,6 +1,7 @@
 "use server";
 
 import { requireStaff } from "@/lib/auth";
+import { logActivity } from "@/lib/activity";
 import { createClient } from "@/lib/supabase/server";
 
 export interface FormState {
@@ -14,7 +15,7 @@ export async function createSession(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireStaff();
+  const { user, profile } = await requireStaff();
 
   const subjectId = String(formData.get("subject_id") ?? "");
   const sectionId = String(formData.get("section_id") ?? "");
@@ -29,9 +30,6 @@ export async function createSession(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
     .from("attendance_sessions")
@@ -56,6 +54,24 @@ export async function createSession(
     return { error: error.message };
   }
 
+  const [subjectInfo, sectionInfo, termInfo] = await Promise.all([
+    supabase.from("subjects").select("code").eq("id", subjectId).maybeSingle(),
+    supabase.from("sections").select("name").eq("id", sectionId).maybeSingle(),
+    supabase.from("academic_terms").select("name").eq("id", termId).maybeSingle(),
+  ]);
+  const label = `${subjectInfo.data?.code ?? subjectId} · Section ${sectionInfo.data?.name ?? "—"} · ${termInfo.data?.name ?? ""}`.trim();
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "attendance.session_create",
+    entityType: "attendance_session",
+    entityId: data.id,
+    entityLabel: label,
+    summary: `Created attendance session — ${label}, ${sessionDate}, period ${period}.`,
+    details: { session_date: sessionDate, period_number: period },
+  });
+
   return { success: "Session created.", sessionId: data.id };
 }
 
@@ -63,7 +79,7 @@ export async function saveAttendance(
   _prev: FormState | undefined,
   formData: FormData,
 ): Promise<FormState> {
-  await requireStaff();
+  const { user, profile } = await requireStaff();
 
   const sessionId = String(formData.get("session_id") ?? "");
   if (!sessionId) return { error: "Missing session." };
@@ -84,7 +100,7 @@ export async function saveAttendance(
 
   const { data: session } = await supabase
     .from("attendance_sessions")
-    .select("section_id")
+    .select("section_id, session_date")
     .eq("id", sessionId)
     .maybeSingle();
 
@@ -114,6 +130,19 @@ export async function saveAttendance(
     }
     return { error: error.message };
   }
+
+  const sessionDate = new Date(session.session_date).toISOString().slice(0, 10);
+  await logActivity(supabase, {
+    actorId: user.id,
+    actorRole: profile?.role === "admin" ? "admin" : "teacher",
+    actorName: profile?.full_name || profile?.email || user.id,
+    action: "attendance.save",
+    entityType: "attendance",
+    entityId: sessionId,
+    entityLabel: `Session ${sessionId.slice(0, 8)} · ${sessionDate}`,
+    summary: `Saved attendance for ${rows.length} students — ${present.size} present, ${rows.length - present.size} absent.`,
+    details: { present: present.size, absent: rows.length - present.size },
+  });
 
   // NOTE: small state object + client refresh (see assessments/actions.ts note).
   return {

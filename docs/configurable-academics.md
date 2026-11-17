@@ -66,6 +66,11 @@ them. Admins remain unrestricted.
   policies re-created with `get_user_role() IN ('admin','teacher')` so read-only
   demo logins cannot write; mark/AI audit inserts restricted to staff; both
   public demo accounts flipped to `viewer`.
+- **013** `activity_log` — one append-only row per write action through the app
+  (students, terms, subjects, enrolments, assessments, marks, attendance, CSV
+  imports, account management), with denormalised `actor_name`/`entity_label`
+  so entries survive deletions. Staff can read; viewers cannot; only staff can
+  insert, and only as themselves. Visible on the `/activity` page.
 
 All four were applied with:
 

@@ -12,6 +12,7 @@ import {
   Eye,
   FileUp,
   GraduationCap,
+  History,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -35,6 +36,7 @@ const nav = [
   { href: "/assessments", label: "Assessments", icon: ClipboardList },
   { href: "/attendance", label: "Attendance", icon: CalendarCheck },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
+  { href: "/activity", label: "Activity", icon: History, staffOnly: true },
   { href: "/teachers", label: "Teachers", icon: GraduationCap, adminOnly: true },
   { href: "/accounts", label: "Accounts", icon: UserCog, adminOnly: true },
 ];
