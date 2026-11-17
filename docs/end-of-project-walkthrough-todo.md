@@ -1,8 +1,16 @@
-# End-of-project walkthrough (PENDING — deliver when the project wraps up)
+# End-of-project walkthrough (DELIVERED → docs/ownership-guide.md)
 
-The user's standing request: once the project is finished, produce a complete,
+The user's standing request was: once the project is finished, produce a complete,
 beginner-friendly explanation of EVERYTHING in this project so they can
 maintain and extend it entirely on their own.
+
+**Status: delivered November 2026 as `docs/ownership-guide.md`** — one master
+document covering the big picture, server/client components, server actions,
+auth and roles, the database and RLS, migrations, secrets, the AI and ML
+layers, the dataset, the audit logs, and the day-to-day workflow (branch →
+PR → preview → merge), with a worked "add a new page" recipe and a glossary.
+
+The original syllabus is kept below for reference.
 
 ## What the final guide must cover
 
