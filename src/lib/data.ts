@@ -97,6 +97,26 @@ export async function getAssessmentSummaries(supabase: Client): Promise<Assessme
   return (data ?? []) as AssessmentSummary[];
 }
 
+export async function getMarkAudit(supabase: Client, assessmentId: string) {
+  const { data } = await supabase
+    .from("mark_audit")
+    .select("id, created_at, student_id, actor_id, actor_role, old_marks, new_marks, old_is_absent, new_is_absent")
+    .eq("assessment_id", assessmentId)
+    .order("created_at", { ascending: false })
+    .limit(12);
+  return (data ?? []) as {
+    id: string;
+    created_at: string;
+    student_id: string;
+    actor_id: string;
+    actor_role: string;
+    old_marks: number | null;
+    new_marks: number;
+    old_is_absent: boolean;
+    new_is_absent: boolean;
+  }[];
+}
+
 export async function getActiveStudents(
   supabase: Client,
 ): Promise<{ id: string; name: string; register_number: string; section_id: string }[]> {

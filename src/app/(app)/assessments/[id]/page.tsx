@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   getActiveStudents,
   getAssessmentSummaries,
+  getMarkAudit,
   getSections,
   getTeacherContext,
 } from "@/lib/data";
@@ -64,6 +65,9 @@ export default async function AssessmentDetailPage({
     .from("marks")
     .select("student_id, marks_obtained, is_absent")
     .eq("assessment_id", id);
+
+  const audit = await getMarkAudit(supabase, id);
+  const studentById = new Map(students.map((student) => [student.id, student.name]));
 
   const markByStudent = new Map(
     (marks ?? []).map((mark) => [
@@ -142,6 +146,47 @@ export default async function AssessmentDetailPage({
           <MarksForm assessmentId={id} maxMarks={assessment.max_marks} rows={rows} editable={editable} />
         )}
       </div>
+
+      <Card
+        title="Correction history"
+        description="Changes to marks already recorded (new entries are not shown)"
+        className="mt-5"
+        bodyClassName="px-0 py-0"
+      >
+        {audit.length === 0 ? (
+          <p className="px-5 py-4 text-sm text-slate-500">No corrections recorded yet.</p>
+        ) : (
+          <div className="thin-scroll overflow-x-auto">
+            <table className="w-full min-w-[560px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+                  <th className="px-5 py-3 font-medium">Student</th>
+                  <th className="px-3 py-3 font-medium">Change</th>
+                  <th className="px-3 py-3 font-medium">Edited by</th>
+                  <th className="px-5 py-3 font-medium">When</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {audit.map((entry) => (
+                  <tr key={entry.id} className="hover:bg-slate-50/70">
+                    <td className="px-5 py-3 text-slate-700">
+                      {studentById.get(entry.student_id) ?? "Student"}
+                    </td>
+                    <td className="px-3 py-3 text-slate-600">
+                      {entry.old_is_absent ? "Absent" : Number(entry.old_marks).toFixed(1)} →{" "}
+                      {entry.new_is_absent ? "Absent" : Number(entry.new_marks).toFixed(1)}
+                    </td>
+                    <td className="px-3 py-3 text-slate-600">
+                      {entry.actor_role}
+                    </td>
+                    <td className="px-5 py-3 text-slate-500">{formatDate(entry.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
     </div>
   );
 }

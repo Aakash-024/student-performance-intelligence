@@ -141,6 +141,40 @@ export async function saveMarks(
 
   if (!entries.length) return { error: "No marks to save. Enter a score or mark absent." };
 
+  // Log corrections: an existing mark whose value or absence flag changes.
+  // First-time entries are not corrections. The audit insert is best-effort:
+  // a logging failure must never block a legitimate mark save.
+  const existing = await supabase
+    .from("marks")
+    .select("student_id, marks_obtained, is_absent")
+    .eq("assessment_id", assessmentId)
+    .in("student_id", entries.map((entry) => entry.student_id));
+  const previous = new Map(
+    (existing.data ?? []).map((row) => [
+      row.student_id as string,
+      { marks: Number(row.marks_obtained), absent: Boolean(row.is_absent) },
+    ]),
+  );
+
+  const corrections = entries
+    .filter((entry) => {
+      const before = previous.get(entry.student_id);
+      return (
+        before &&
+        (before.marks !== entry.marks_obtained || before.absent !== entry.is_absent)
+      );
+    })
+    .map((entry) => ({
+      assessment_id: assessmentId,
+      student_id: entry.student_id,
+      actor_id: user.id,
+      actor_role: profile?.role ?? "teacher",
+      old_marks: previous.get(entry.student_id)!.marks,
+      new_marks: entry.marks_obtained,
+      old_is_absent: previous.get(entry.student_id)!.absent,
+      new_is_absent: entry.is_absent,
+    }));
+
   const { error } = await supabase
     .from("marks")
     .upsert(entries, { onConflict: "student_id,assessment_id" });
@@ -150,6 +184,11 @@ export async function saveMarks(
       return { error: "You are not assigned to this subject/section, so the database rejected the write." };
     }
     return { error: error.message };
+  }
+
+  if (corrections.length) {
+    const { error: auditError } = await supabase.from("mark_audit").insert(corrections);
+    if (auditError) console.error("[audit] failed to log mark corrections:", auditError.message);
   }
 
   // NOTE: return a small state object and let the client refresh.
