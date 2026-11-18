@@ -35,12 +35,12 @@ const data = {
   attendanceFrom: formatDotDate("2026-01-10"),
   attendanceTo: formatDotDate("2026-06-10"),
   subjects: [
-    { code: "CS201", name: "Data Structures and Algorithms", marks: 45, maxMarks: 50, absent: false },
-    { code: "CS202", name: "Object Oriented Programming", marks: 39, maxMarks: 50, absent: false },
-    { code: "CS203", name: "Database Management Systems", marks: 43, maxMarks: 50, absent: false },
-    { code: "CS204", name: "Computer Networks", marks: 24, maxMarks: 50, absent: false },
-    { code: "CS205", name: "Data Structures Lab", marks: 48, maxMarks: 50, absent: false },
-    { code: "CS206", name: "Discrete Mathematics", marks: null, maxMarks: 50, absent: true },
+    { code: "CS201", name: "Data Structures and Algorithms", marks: 90, maxMarks: 100, absent: false },
+    { code: "CS202", name: "Object Oriented Programming", marks: 78, maxMarks: 100, absent: false },
+    { code: "CS203", name: "Database Management Systems", marks: 86, maxMarks: 100, absent: false },
+    { code: "CS204", name: "Computer Networks", marks: 48, maxMarks: 100, absent: false },
+    { code: "CS205", name: "Data Structures Lab", marks: 96, maxMarks: 100, absent: false },
+    { code: "CS206", name: "Discrete Mathematics", marks: null, maxMarks: 100, absent: true },
   ],
   reportDate: formatDotDate(new Date().toISOString().slice(0, 10)),
 };

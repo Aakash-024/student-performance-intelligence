@@ -102,7 +102,7 @@ export function CreateAssessmentForm({
               type="number"
               min={1}
               step="0.5"
-              defaultValue={50}
+              defaultValue={100}
               required
               className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500"
             />

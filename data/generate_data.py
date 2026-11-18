@@ -55,8 +55,9 @@ SUBJECTS = [
 ]
 
 ASSESSMENTS = [
-    {"type": "cat1",     "max_marks": 50,  "weightage": 25},
-    {"type": "cat2",     "max_marks": 50,  "weightage": 25},
+    # Every exam is marked out of 100. Weights are separate from the mark scale.
+    {"type": "cat1",     "max_marks": 100, "weightage": 25},
+    {"type": "cat2",     "max_marks": 100, "weightage": 25},
     {"type": "semester", "max_marks": 100, "weightage": 50},
 ]
 
