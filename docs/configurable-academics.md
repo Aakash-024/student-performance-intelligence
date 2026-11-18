@@ -59,6 +59,8 @@ them. Admins remain unrestricted.
 - **010** placeholder `internal` assessments deleted; type check narrowed to
   `cat1`/`cat2`/`semester`; demo weightage redistributed to 25/25/50 so totals
   stay at 100; staff write + delete policies for assessments.
+  All three exam types are marked **out of 100** — marks are stored and displayed
+  exactly as recorded, with no scaling or conversion anywhere in the app.
 - **011** `students_insert_admin`/`students_update_admin` replaced with staff
   policies so teachers can create and edit students (needed for CSV import).
   Student **delete** stays admin-only.
