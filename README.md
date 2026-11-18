@@ -45,12 +45,16 @@ trigger prevents a signed-in user from promoting themselves.
 - Departments, sections, subjects, academic terms (up to 8 semesters).
 - Assessments of type `cat1`, `cat2`, `semester` with configurable max marks and
   weightage. Teachers and administrators can edit the whole structure at any time.
+  **Every exam is marked out of 100** — marks are stored and displayed exactly as
+  entered, with no scaling or conversion anywhere in the app.
 - Student records with register number, section, year and status.
 - Enrollments linking students to subjects per term.
 
 ### Marks
 
 - Enter or edit marks for an assessment, with per-student **Absent** toggles.
+- Marks are on a 0–100 scale for CAT 1, CAT 2 and the Semester exam alike; the
+  report prints the recorded value directly (no ×2, no percentage re-scaling).
 - Validation: marks must be numeric, non-negative and within the assessment maximum.
 - Coverage tracker shows recorded vs expected entries and flags missing marks.
 - Teacher writes are limited to the sections assigned to them for that subject and term.
@@ -164,7 +168,7 @@ supabase/migrations/
 
 data/
   generate_data.py         deterministic synthetic data generator
-  generated/*.csv          the actual seed data (150 students, 6000 marks, ...)
+  generated/*.csv          the actual seed data (150 students, 4,500 marks, ...)
 
 scripts/seed.mjs           deterministic reseed over the PostgREST API
 scripts/ml/train.py        Phase 5 model training (Pandas + NumPy -> model.json)
@@ -174,8 +178,8 @@ scripts/ml/train.py        Phase 5 model training (Pandas + NumPy -> model.json)
 
 Register numbers, UUIDs, marks and attendance are generated once with a fixed seed. Re-running the
 generator produces the same IDs, so the database, screenshots and documentation stay consistent.
-150 students × 3 sections × 5 subjects × 2 semesters are loaded, with 40 assessments,
-1,500 enrollments, 6,000 marks, 360 attendance sessions and 18,000 attendance records.
+150 students × 3 sections × 5 subjects × 2 semesters are loaded, with 30 assessments,
+1,500 enrollments, 4,500 marks, 360 attendance sessions and 18,000 attendance records.
 
 ---
 

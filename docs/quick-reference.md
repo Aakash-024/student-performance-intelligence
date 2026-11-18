@@ -21,6 +21,10 @@ keep open while working.
 | **teacher** | Their assigned classes' students | Structure everywhere; marks/attendance only for their classes |
 | **viewer** (demo) | Everything | **Nothing** — locked in DB and UI |
 
+**All exams are out of 100.** CAT 1, CAT 2 and Semester all use a 0–100 mark scale. The
+report prints the recorded mark as-is — there is no conversion anywhere. Weights
+(25 / 25 / 50) are separate from the 100-mark scale.
+
 Demo logins: `admin@college.edu / Admin@123`, `teacher@college.edu / Teacher@123` (view-only).
 Your admin login: the one you created on the Accounts page.
 
@@ -82,3 +86,4 @@ Every write action must: `requireStaff()`, validate inputs, and `logActivity(...
 3. Audit logs (`activity_log`, `mark_audit`) are append-only. Never weaken them.
 4. `features.ts` ↔ `ml/train.py` must list the same features, or retrain.
 5. `npm run seed` destroys marks — never once real data is loaded.
+6. Every exam is out of 100 — never add a conversion factor to marks or reports.
