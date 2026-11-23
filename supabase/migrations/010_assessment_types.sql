@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 010: CAT 1 / CAT 2 / Semester exam only
+-- ACADNEX Migration 010: CAT 1 / CAT 2 / Semester exam only
 -- ============================================================================
 -- The generic "internal" assessment was a placeholder. The college runs two
 -- internal exams named CAT 1 and CAT 2, so remove the placeholder entirely.

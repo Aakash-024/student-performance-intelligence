@@ -38,28 +38,28 @@ export const indicatorMeta: Record<
 > = {
   high_performer: {
     label: "High performer",
-    className: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-    dot: "bg-emerald-500",
+    className: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/25",
+    dot: "bg-emerald-400",
   },
   improving: {
     label: "Improving",
-    className: "bg-sky-50 text-sky-700 ring-sky-600/20",
-    dot: "bg-sky-500",
+    className: "bg-sky-500/10 text-sky-400 ring-sky-500/25",
+    dot: "bg-sky-400",
   },
   on_track: {
     label: "On track",
-    className: "bg-slate-100 text-slate-700 ring-slate-500/20",
+    className: "bg-slate-500/10 text-brand-muted ring-slate-400/20",
     dot: "bg-slate-400",
   },
   declining: {
     label: "Declining",
-    className: "bg-amber-50 text-amber-800 ring-amber-600/20",
-    dot: "bg-amber-500",
+    className: "bg-amber-500/10 text-amber-400 ring-amber-500/25",
+    dot: "bg-amber-400",
   },
   at_risk: {
     label: "At risk",
-    className: "bg-rose-50 text-rose-700 ring-rose-600/20",
-    dot: "bg-rose-500",
+    className: "bg-rose-500/10 text-rose-400 ring-rose-500/25",
+    dot: "bg-rose-400",
   },
 };
 

@@ -53,17 +53,17 @@ export default async function StudentsPage({
       <div className="mb-5">{canEdit ? <CreateStudentForm sections={sections} /> : <ReadOnlyNote what="adding students" />}</div>
 
       <div className="mb-5 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">In view</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{visible.length}</p>
+        <div className="rounded-2xl border border-brand-border bg-brand-navy px-5 py-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-brand-muted">In view</p>
+          <p className="mt-1 text-2xl font-semibold text-brand-text">{visible.length}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Average score</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{formatPercent(avg)}</p>
+        <div className="rounded-2xl border border-brand-border bg-brand-navy px-5 py-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-brand-muted">Average score</p>
+          <p className="mt-1 text-2xl font-semibold text-brand-text">{formatPercent(avg)}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Needs attention</p>
-          <p className="mt-1 text-2xl font-semibold text-rose-600">
+        <div className="rounded-2xl border border-brand-border bg-brand-navy px-5 py-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-brand-muted">Needs attention</p>
+          <p className="mt-1 text-2xl font-semibold text-rose-400">
             {visible.filter((student) => ["at_risk", "declining"].includes(student.indicator)).length}
           </p>
         </div>
@@ -72,23 +72,23 @@ export default async function StudentsPage({
       <Card bodyClassName="px-4 py-4 sm:px-5">
         <form method="get" className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted" />
             <input
               name="q"
               defaultValue={params.q ?? ""}
               placeholder="Search by name or register number…"
-              className="w-full rounded-xl border border-slate-200 bg-slate-50/60 py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+              className="w-full rounded-xl border border-brand-border bg-brand-panel/60 py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-brand-cyan focus:bg-brand-navy focus:ring-4 focus:ring-brand-blue/15"
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+            <span className="inline-flex items-center gap-1.5 text-xs text-brand-muted">
               <SlidersHorizontal className="h-3.5 w-3.5" /> Filter
             </span>
             <select
               name="section"
               defaultValue={params.section ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">All sections</option>
               {sections.map((section) => (
@@ -101,7 +101,7 @@ export default async function StudentsPage({
             <select
               name="indicator"
               defaultValue={params.indicator ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">All indicators</option>
               {INDICATOR_ORDER.map((indicator) => (
@@ -113,14 +113,14 @@ export default async function StudentsPage({
 
             <button
               type="submit"
-              className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
             >
               Apply
             </button>
             {params.q || params.section || params.indicator ? (
               <Link
                 href="/students"
-                className="rounded-xl px-2 py-2 text-sm text-slate-500 transition hover:text-slate-800"
+                className="rounded-xl px-2 py-2 text-sm text-brand-muted transition hover:text-brand-text"
               >
                 Reset
               </Link>
@@ -129,7 +129,7 @@ export default async function StudentsPage({
         </form>
       </Card>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-5 overflow-hidden rounded-2xl border border-brand-border bg-brand-navy shadow-sm">
         {visible.length === 0 ? (
           <div className="p-6">
             <EmptyState
@@ -138,7 +138,7 @@ export default async function StudentsPage({
               action={
                 <Link
                   href="/students"
-                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white"
+                  className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-3.5 py-2 text-sm font-medium text-white"
                 >
                   <Users className="h-4 w-4" /> Show all students
                 </Link>
@@ -149,7 +149,7 @@ export default async function StudentsPage({
           <div className="thin-scroll overflow-x-auto">
             <table className="w-full min-w-[860px] text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-brand-border bg-brand-panel/70 text-xs uppercase tracking-wide text-brand-muted">
                   <th className="px-5 py-3 font-medium">Student</th>
                   <th className="px-3 py-3 font-medium">Section</th>
                   <th className="px-3 py-3 font-medium">Average</th>
@@ -158,25 +158,25 @@ export default async function StudentsPage({
                   <th className="px-5 py-3 font-medium">Indicator</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-brand-border">
                 {visible.map((student) => (
-                  <tr key={student.student_id} className="transition hover:bg-slate-50/70">
+                  <tr key={student.student_id} className="transition hover:bg-brand-panel/70">
                     <td className="px-5 py-3">
                       <Link href={`/students/${student.student_id}`} className="group block">
-                        <p className="font-medium text-slate-800 group-hover:text-indigo-600">
+                        <p className="font-medium text-brand-text group-hover:text-brand-cyan">
                           {student.name}
                         </p>
-                        <p className="text-xs text-slate-500">{student.register_number}</p>
+                        <p className="text-xs text-brand-muted">{student.register_number}</p>
                       </Link>
                     </td>
-                    <td className="px-3 py-3 text-slate-600">{student.section_name}</td>
+                    <td className="px-3 py-3 text-brand-muted">{student.section_name}</td>
                     <td className="px-3 py-3">
                       <div className="w-32">
                         <div className="mb-1 flex justify-between text-xs">
-                          <span className="font-medium text-slate-700">
+                          <span className="font-medium text-brand-text">
                             {formatPercent(student.avg_percentage)}
                           </span>
-                          <span className="text-slate-400">
+                          <span className="text-brand-muted">
                             {student.subjects_passed}/{student.subjects_count} passed
                           </span>
                         </div>
@@ -195,7 +195,7 @@ export default async function StudentsPage({
                     <td className="px-3 py-3">
                       <span
                         className={
-                          student.attendance_percentage < 60 ? "font-medium text-rose-600" : "text-slate-600"
+                          student.attendance_percentage < 60 ? "font-medium text-rose-400" : "text-brand-muted"
                         }
                       >
                         {formatPercent(student.attendance_percentage)}
@@ -205,10 +205,10 @@ export default async function StudentsPage({
                       <span
                         className={
                           student.change > 0
-                            ? "text-emerald-600"
+                            ? "text-emerald-400"
                             : student.change < 0
-                              ? "text-rose-600"
-                              : "text-slate-500"
+                              ? "text-rose-400"
+                              : "text-brand-muted"
                         }
                       >
                         {student.change > 0 ? "+" : ""}
@@ -225,7 +225,7 @@ export default async function StudentsPage({
           </div>
         )}
       </div>
-      <p className="mt-3 text-xs text-slate-500">
+      <p className="mt-3 text-xs text-brand-muted">
         Showing {visible.length} students · Indicators use deterministic thresholds (see dashboard).
       </p>
     </div>

@@ -104,15 +104,29 @@ export default async function StudentDetailPage({
   const departmentCode = progressReportConfig.departmentCode || department?.code || "—";
   const departmentName = progressReportConfig.departmentName || department?.name || "—";
 
-  const cat1BySubject = new Map(
-    marks
-      .filter(
-        (mark) =>
-          mark.assessments?.type === "cat1" &&
-          mark.assessments.academic_terms?.name === currentTerm?.name,
-      )
-      .map((mark) => [mark.assessments!.subject_id, mark]),
+  const currentTermMarks = marks.filter(
+    (mark) => mark.assessments?.academic_terms?.name === currentTerm?.name,
   );
+  const marksByType = (type: string) =>
+    new Map(
+      currentTermMarks
+        .filter((mark) => mark.assessments?.type === type)
+        .map((mark) => [mark.assessments!.subject_id, mark]),
+    );
+  const cat1BySubject = marksByType("cat1");
+  const cat2BySubject = marksByType("cat2");
+  const semesterBySubject = marksByType("semester");
+
+  const examForReport = (
+    mark: (typeof currentTermMarks)[number] | undefined,
+  ) => {
+    if (!mark?.assessments) return null;
+    return {
+      marks: mark.is_absent ? null : Number(mark.marks_obtained),
+      maxMarks: Number(mark.assessments.max_marks),
+      absent: mark.is_absent,
+    };
+  };
 
   const mlFeatures = buildFeatures({
     overview,
@@ -129,7 +143,7 @@ export default async function StudentDetailPage({
     section: departmentCode === "—" ? (student.sections?.name ?? "—") : `${departmentCode}-${student.sections?.name ?? "—"}`,
     departmentName,
     departmentCode,
-    course: `B.TECH (${departmentCode})`,
+    course: `${progressReportConfig.degree} (${departmentCode})`,
     semester: currentTerm?.semester ?? 1,
     academicYear: currentTerm ? toAcademicYear(currentTerm.year) : "—",
     attendancePercent: overview?.attendance_percentage ?? 0,
@@ -137,13 +151,12 @@ export default async function StudentDetailPage({
     attendanceTo: formatDotDate(currentTerm?.end_date),
     subjects: currentSubjects.map((row) => {
       const subject = subjectById.get(row.subject_id);
-      const mark = cat1BySubject.get(row.subject_id);
       return {
         code: subject?.code ?? "—",
         name: subject?.name ?? "Subject",
-        marks: mark && !mark.is_absent ? Number(mark.marks_obtained) : null,
-        maxMarks: mark?.assessments?.max_marks ?? 0,
-        absent: mark?.is_absent ?? false,
+        cat1: examForReport(cat1BySubject.get(row.subject_id)),
+        cat2: examForReport(cat2BySubject.get(row.subject_id)),
+        semester: examForReport(semesterBySubject.get(row.subject_id)),
       };
     }),
     reportDate: formatDotDate(new Date().toISOString().slice(0, 10)),
@@ -153,7 +166,7 @@ export default async function StudentDetailPage({
     <div>
       <Link
         href="/students"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 transition hover:text-slate-800"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-brand-muted transition hover:text-brand-text"
       >
         <ArrowLeft className="h-4 w-4" /> Back to students
       </Link>
@@ -164,14 +177,14 @@ export default async function StudentDetailPage({
         actions={<ReportButton data={reportData} />}
       />
 
-      <div className="mb-5 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+      <div className="mb-5 flex flex-wrap items-center gap-3 text-sm text-brand-muted">
         {overview ? <IndicatorBadge indicator={overview.indicator} /> : null}
         {student.email ? (
-          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+          <span className="inline-flex items-center gap-1.5 text-xs text-brand-muted">
             <Mail className="h-3.5 w-3.5" /> {student.email}
           </span>
         ) : null}
-        <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+        <span className="inline-flex items-center gap-1.5 text-xs text-brand-muted">
           <GraduationCap className="h-3.5 w-3.5" /> Rank {Math.max(rank, 1)} of {sameSection.length}
         </span>
       </div>
@@ -247,27 +260,27 @@ export default async function StudentDetailPage({
           <div className="thin-scroll overflow-x-auto">
             <table className="w-full min-w-[520px] text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-brand-border bg-brand-panel/70 text-xs uppercase tracking-wide text-brand-muted">
                   <th className="px-5 py-3 font-medium">Subject</th>
                   <th className="px-3 py-3 font-medium">Current</th>
                   <th className="px-3 py-3 font-medium">Previous</th>
                   <th className="px-5 py-3 font-medium">Change</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-brand-border">
                 {currentSubjects.map((row) => {
                   const subject = subjectById.get(row.subject_id);
                   const previous = previousSubjects.get(row.subject_id);
                   const change = previous === undefined ? null : row.percentage - previous;
                   return (
-                    <tr key={row.subject_id} className="hover:bg-slate-50/70">
+                    <tr key={row.subject_id} className="hover:bg-brand-panel/70">
                       <td className="px-5 py-3">
-                        <p className="font-medium text-slate-800">{subject?.name ?? "Subject"}</p>
-                        <p className="text-xs text-slate-500">{subject?.code ?? "—"}</p>
+                        <p className="font-medium text-brand-text">{subject?.name ?? "Subject"}</p>
+                        <p className="text-xs text-brand-muted">{subject?.code ?? "—"}</p>
                       </td>
                       <td className="px-3 py-3">
                         <div className="w-28">
-                          <div className="mb-1 text-xs font-medium text-slate-700">
+                          <div className="mb-1 text-xs font-medium text-brand-text">
                             {formatPercent(row.percentage)}
                           </div>
                           <ProgressBar
@@ -276,20 +289,20 @@ export default async function StudentDetailPage({
                           />
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-slate-600">
+                      <td className="px-3 py-3 text-brand-muted">
                         {previous === undefined ? "—" : formatPercent(previous)}
                       </td>
                       <td className="px-5 py-3">
                         {change === null ? (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-brand-muted">—</span>
                         ) : (
                           <span
                             className={
                               change > 0
-                                ? "font-medium text-emerald-600"
+                                ? "font-medium text-emerald-400"
                                 : change < 0
-                                  ? "font-medium text-rose-600"
-                                  : "text-slate-500"
+                                  ? "font-medium text-rose-400"
+                                  : "text-brand-muted"
                             }
                           >
                             {change > 0 ? "+" : ""}
@@ -311,8 +324,8 @@ export default async function StudentDetailPage({
               {attendanceRows.map((row) => (
                 <div key={row.term}>
                   <div className="mb-1 flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-700">{row.term}</span>
-                    <span className="text-slate-500">
+                    <span className="font-medium text-brand-text">{row.term}</span>
+                    <span className="text-brand-muted">
                       {row.percentage.toFixed(1)}% · {row.sessions} sessions
                     </span>
                   </div>
@@ -326,12 +339,12 @@ export default async function StudentDetailPage({
           </Card>
 
           <Card title="Classification" description="How the indicator is calculated">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-brand-muted">
               {indicatorMeta[overview?.indicator ?? "on_track"].label} — based on the current-term
               average of {formatPercent(overview?.avg_percentage ?? 0)} and attendance of{" "}
               {formatPercent(overview?.attendance_percentage ?? 0)}.
             </p>
-            <ul className="mt-3 space-y-2 text-xs text-slate-500">
+            <ul className="mt-3 space-y-2 text-xs text-brand-muted">
               <li>At risk: average below 40% or attendance below 60%.</li>
               <li>Declining: dropped 5+ points versus the previous term.</li>
               <li>High performer: average 75%+ with attendance 85%+.</li>
@@ -354,7 +367,7 @@ export default async function StudentDetailPage({
         <div className="thin-scroll overflow-x-auto">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-brand-border bg-brand-panel/70 text-xs uppercase tracking-wide text-brand-muted">
                 <th className="px-5 py-3 font-medium">Date</th>
                 <th className="px-3 py-3 font-medium">Subject</th>
                 <th className="px-3 py-3 font-medium">Assessment</th>
@@ -362,7 +375,7 @@ export default async function StudentDetailPage({
                 <th className="px-5 py-3 font-medium">Score</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-brand-border">
               {marks
                 .filter((mark) => mark.assessments)
                 .sort((a, b) => (b.assessments?.date ?? "").localeCompare(a.assessments?.date ?? ""))
@@ -373,26 +386,26 @@ export default async function StudentDetailPage({
                     ? 0
                     : (mark.marks_obtained / assessment.max_marks) * 100;
                   return (
-                    <tr key={`${assessment.subject_id}-${index}`} className="hover:bg-slate-50/70">
-                      <td className="px-5 py-3 text-slate-600">{formatDate(assessment.date)}</td>
-                      <td className="px-3 py-3 text-slate-700">
+                    <tr key={`${assessment.subject_id}-${index}`} className="hover:bg-brand-panel/70">
+                      <td className="px-5 py-3 text-brand-muted">{formatDate(assessment.date)}</td>
+                      <td className="px-3 py-3 text-brand-text">
                         {subjectById.get(assessment.subject_id)?.name ?? "—"}
                       </td>
-                      <td className="px-3 py-3 text-slate-600">
+                      <td className="px-3 py-3 text-brand-muted">
                         {assessment.type.toUpperCase()} ·{" "}
                         {termLabel(assessment.academic_terms?.name ?? "—")}
                       </td>
-                      <td className="px-3 py-3 text-slate-700">
+                      <td className="px-3 py-3 text-brand-text">
                         {mark.is_absent ? "Absent" : `${mark.marks_obtained} / ${assessment.max_marks}`}
                       </td>
                       <td className="px-5 py-3">
                         <span
                           className={
                             percentage >= 75
-                              ? "font-medium text-emerald-600"
+                              ? "font-medium text-emerald-400"
                               : percentage < 40
-                                ? "font-medium text-rose-600"
-                                : "text-slate-700"
+                                ? "font-medium text-rose-400"
+                                : "text-brand-text"
                           }
                         >
                           {percentage.toFixed(1)}%

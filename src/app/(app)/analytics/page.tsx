@@ -195,7 +195,7 @@ export default async function AnalyticsPage({
             <select
               name="term"
               defaultValue={selectedTermId}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               {terms.map((term) => (
                 <option key={term.id} value={term.id}>
@@ -205,7 +205,7 @@ export default async function AnalyticsPage({
             </select>
             <button
               type="submit"
-              className="rounded-xl bg-slate-900 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+              className="rounded-xl bg-brand-blue px-3.5 py-2 text-sm font-medium text-white transition hover:brightness-110"
             >
               View
             </button>
@@ -247,8 +247,8 @@ export default async function AnalyticsPage({
             {typeRows.map((row) => (
               <div key={row.type}>
                 <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-700">{assessmentLabel(row.type)}</span>
-                  <span className="text-slate-500">
+                  <span className="font-medium text-brand-text">{assessmentLabel(row.type)}</span>
+                  <span className="text-brand-muted">
                     {row.count} assessment{row.count === 1 ? "" : "s"} · {formatPercent(row.avg)}
                   </span>
                 </div>
@@ -269,20 +269,20 @@ export default async function AnalyticsPage({
         <Card title="Section averages" description={`${termLabel(selectedTerm?.name ?? "Term")} summary`} bodyClassName="px-0 py-0">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-brand-border bg-brand-panel/70 text-xs uppercase tracking-wide text-brand-muted">
                 <th className="px-5 py-3 font-medium">Section</th>
                 <th className="px-3 py-3 font-medium">Students</th>
                 <th className="px-3 py-3 font-medium">Average</th>
                 <th className="px-5 py-3 font-medium">Attendance</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-brand-border">
               {currentSections.map((row) => (
-                <tr key={row.section_id} className="hover:bg-slate-50/60">
-                  <td className="px-5 py-3 font-medium text-slate-800">Section {row.section_name}</td>
-                  <td className="px-3 py-3 text-slate-600">{row.student_count}</td>
-                  <td className="px-3 py-3 text-slate-700">{formatPercent(row.avg_percentage)}</td>
-                  <td className="px-5 py-3 text-slate-600">{formatPercent(row.attendance_percentage)}</td>
+                <tr key={row.section_id} className="hover:bg-brand-panel/60">
+                  <td className="px-5 py-3 font-medium text-brand-text">Section {row.section_name}</td>
+                  <td className="px-3 py-3 text-brand-muted">{row.student_count}</td>
+                  <td className="px-3 py-3 text-brand-text">{formatPercent(row.avg_percentage)}</td>
+                  <td className="px-5 py-3 text-brand-muted">{formatPercent(row.attendance_percentage)}</td>
                 </tr>
               ))}
             </tbody>
@@ -294,10 +294,10 @@ export default async function AnalyticsPage({
         <Card
           title="Top performers"
           description="Highest averages in scope"
-          action={<Link href="/students?indicator=high_performer" className="text-xs font-medium text-indigo-600 hover:text-indigo-700">View all</Link>}
+          action={<Link href="/students?indicator=high_performer" className="text-xs font-medium text-brand-cyan hover:text-brand-cyan">View all</Link>}
           bodyClassName="px-0 py-0"
         >
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-brand-border">
             {topPerformers.map((student) => (
               <StudentLine key={student.student_id} student={student} metric="score" />
             ))}
@@ -307,12 +307,12 @@ export default async function AnalyticsPage({
         <Card
           title="Declining performance"
           description="Largest drop versus the previous term"
-          action={<Link href="/students?indicator=declining" className="text-xs font-medium text-indigo-600 hover:text-indigo-700">View all</Link>}
+          action={<Link href="/students?indicator=declining" className="text-xs font-medium text-brand-cyan hover:text-brand-cyan">View all</Link>}
           bodyClassName="px-0 py-0"
         >
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-brand-border">
             {declining.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-slate-500">No declining students.</p>
+              <p className="px-5 py-8 text-center text-sm text-brand-muted">No declining students.</p>
             ) : (
               declining.slice(0, 8).map((student) => (
                 <StudentLine key={student.student_id} student={student} metric="change" />
@@ -326,12 +326,12 @@ export default async function AnalyticsPage({
         <Card
           title="Low attendance"
           description="Below 75% attendance"
-          action={<CalendarX className="h-4 w-4 text-slate-400" />}
+          action={<CalendarX className="h-4 w-4 text-brand-muted" />}
           bodyClassName="px-0 py-0"
         >
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-brand-border">
             {lowAttendance.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-slate-500">
+              <p className="px-5 py-8 text-center text-sm text-brand-muted">
                 Every student is above 75% attendance.
               </p>
             ) : (
@@ -343,9 +343,9 @@ export default async function AnalyticsPage({
         </Card>
 
         <Card title="At-risk students" description="Average below 40% or attendance below 60%" bodyClassName="px-0 py-0">
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-brand-border">
             {atRisk.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-slate-500">No at-risk students.</p>
+              <p className="px-5 py-8 text-center text-sm text-brand-muted">No at-risk students.</p>
             ) : (
               atRisk
                 .sort((a, b) => a.avg_percentage - b.avg_percentage)
@@ -354,16 +354,16 @@ export default async function AnalyticsPage({
                   <Link
                     key={student.student_id}
                     href={`/students/${student.student_id}`}
-                    className="flex items-center justify-between gap-3 px-5 py-3 transition hover:bg-slate-50"
+                    className="flex items-center justify-between gap-3 px-5 py-3 transition hover:bg-brand-panel"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-slate-800">{student.name}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="truncate text-sm font-medium text-brand-text">{student.name}</p>
+                      <p className="text-xs text-brand-muted">
                         {student.register_number} · Section {student.section_name}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs font-medium text-rose-600">
+                      <span className="text-xs font-medium text-rose-400">
                         {formatPercent(student.avg_percentage)}
                       </span>
                       <TrendingDown className="h-4 w-4 text-rose-500" />
@@ -375,7 +375,7 @@ export default async function AnalyticsPage({
         </Card>
       </div>
 
-      <p className="mt-4 text-xs text-slate-500">
+      <p className="mt-4 text-xs text-brand-muted">
         These indicators are transparent rule-based calculations, not machine learning. Students in
         scope: {students.length} · marks tables filtered by your role through RLS.
       </p>
@@ -402,11 +402,11 @@ function StudentLine({
   return (
     <Link
       href={`/students/${student.student_id}`}
-      className="flex items-center justify-between gap-3 px-5 py-3 transition hover:bg-slate-50"
+      className="flex items-center justify-between gap-3 px-5 py-3 transition hover:bg-brand-panel"
     >
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-slate-800">{student.name}</p>
-        <p className="text-xs text-slate-500">
+        <p className="truncate text-sm font-medium text-brand-text">{student.name}</p>
+        <p className="text-xs text-brand-muted">
           {student.register_number} · Section {student.section_name}
         </p>
       </div>
@@ -425,7 +425,7 @@ function StudentLine({
             }
           />
         </div>
-        <span className="w-20 text-right text-xs font-medium text-slate-700">
+        <span className="w-20 text-right text-xs font-medium text-brand-text">
           {metric === "attendance"
             ? formatPercent(student.attendance_percentage)
             : metric === "change"

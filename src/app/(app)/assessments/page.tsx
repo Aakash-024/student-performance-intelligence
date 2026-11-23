@@ -103,11 +103,11 @@ export default async function AssessmentsPage({
       <Card className="mt-5" bodyClassName="px-4 py-4 sm:px-5">
         <form method="get" className="flex flex-wrap items-end gap-3">
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Term</span>
+            <span className="mb-1 block text-xs font-medium text-brand-muted">Term</span>
             <select
               name="term"
               defaultValue={params.term ?? currentTerm?.id ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">All terms</option>
               {terms.map((term) => (
@@ -118,11 +118,11 @@ export default async function AssessmentsPage({
             </select>
           </label>
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Subject</span>
+            <span className="mb-1 block text-xs font-medium text-brand-muted">Subject</span>
             <select
               name="subject"
               defaultValue={params.subject ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">All subjects</option>
               {subjects.map((subject) => (
@@ -134,17 +134,17 @@ export default async function AssessmentsPage({
           </label>
           <button
             type="submit"
-            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
           >
             Apply
           </button>
-          <Link href="/assessments" className="rounded-xl px-2 py-2 text-sm text-slate-500 hover:text-slate-800">
+          <Link href="/assessments" className="rounded-xl px-2 py-2 text-sm text-brand-muted hover:text-brand-text">
             Reset
           </Link>
         </form>
       </Card>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-5 overflow-hidden rounded-2xl border border-brand-border bg-brand-navy shadow-sm">
         {rows.length === 0 ? (
           <div className="p-6">
             <EmptyState
@@ -160,7 +160,7 @@ export default async function AssessmentsPage({
           <div className="thin-scroll overflow-x-auto">
             <table className="w-full min-w-[980px] text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-brand-border bg-brand-panel/70 text-xs uppercase tracking-wide text-brand-muted">
                   <th className="px-5 py-3 font-medium">Assessment</th>
                   <th className="px-3 py-3 font-medium">Term</th>
                   <th className="px-3 py-3 font-medium">Date</th>
@@ -170,27 +170,27 @@ export default async function AssessmentsPage({
                   <th className="px-5 py-3 font-medium"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-brand-border">
                 {rows.map(({ assessment, summary, expected, missing }) => {
                   const subject = subjectById.get(assessment.subject_id);
                   const recorded = summary?.marks_count ?? 0;
                   const coverage = expected ? (recorded / expected) * 100 : 0;
                   return (
-                    <tr key={assessment.id} className="align-top hover:bg-slate-50/60">
+                    <tr key={assessment.id} className="align-top hover:bg-brand-panel/60">
                       <td className="px-5 py-3">
-                        <p className="font-medium text-slate-800">
+                        <p className="font-medium text-brand-text">
                           {subject?.code ?? "—"} · {assessmentLabel(assessment.type)}
                         </p>
-                        <p className="text-xs text-slate-500">{subject?.name ?? "Subject"}</p>
+                        <p className="text-xs text-brand-muted">{subject?.name ?? "Subject"}</p>
                         <div className="mt-2 max-w-xs">
                           {canEdit ? <EditAssessmentForm assessment={assessment} /> : null}
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-slate-600">
+                      <td className="px-3 py-3 text-brand-muted">
                         {termLabel(assessment.academic_terms?.name ?? "—")}
                       </td>
-                      <td className="px-3 py-3 text-slate-600">{formatDate(assessment.date)}</td>
-                      <td className="px-3 py-3 text-slate-600">
+                      <td className="px-3 py-3 text-brand-muted">{formatDate(assessment.date)}</td>
+                      <td className="px-3 py-3 text-brand-muted">
                         {assessment.max_marks} / {assessment.weightage_percent}%
                       </td>
                       <td className="px-3 py-3">
@@ -198,12 +198,12 @@ export default async function AssessmentsPage({
                           <div className="mb-1 flex justify-between text-xs">
                             <span
                               className={
-                                missing > 0 ? "font-medium text-amber-600" : "font-medium text-emerald-600"
+                                missing > 0 ? "font-medium text-amber-400" : "font-medium text-emerald-400"
                               }
                             >
                               {recorded}/{expected}
                             </span>
-                            <span className="text-slate-400">{missing > 0 ? `${missing} missing` : "complete"}</span>
+                            <span className="text-brand-muted">{missing > 0 ? `${missing} missing` : "complete"}</span>
                           </div>
                           <ProgressBar value={coverage} tone={missing > 0 ? "amber" : "emerald"} />
                         </div>
@@ -212,8 +212,8 @@ export default async function AssessmentsPage({
                         <span
                           className={
                             (summary?.avg_percentage ?? 0) < 40
-                              ? "font-medium text-rose-600"
-                              : "font-medium text-slate-700"
+                              ? "font-medium text-rose-400"
+                              : "font-medium text-brand-text"
                           }
                         >
                           {summary?.avg_percentage != null ? formatPercent(summary.avg_percentage) : "—"}
@@ -222,7 +222,7 @@ export default async function AssessmentsPage({
                       <td className="px-5 py-3 text-right">
                         <Link
                           href={`/assessments/${assessment.id}`}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700"
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-brand-blue px-3 py-1.5 text-xs font-medium text-white transition hover:brightness-110"
                         >
                           {missing > 0 ? "Enter marks" : "Review marks"}
                         </Link>
@@ -235,7 +235,7 @@ export default async function AssessmentsPage({
           </div>
         )}
       </div>
-      <p className="mt-3 text-xs text-slate-500">
+      <p className="mt-3 text-xs text-brand-muted">
         {isAdmin || !canEdit
           ? `Coverage is measured against all ${students.length} active students.`
           : `Coverage is measured against students in your assigned sections (${sections.filter((s) => assignments.some((a) => a.section_id === s.id)).length} sections).`}

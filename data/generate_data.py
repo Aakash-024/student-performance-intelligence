@@ -1,5 +1,5 @@
 """
-Synthetic Data Generator for Student Performance Intelligence Platform (SPIP)
+Synthetic Data Generator for Student Performance Intelligence Platform (ACADNEX)
 =============================================================================
 Generates realistic, reproducible academic data for demonstration purposes.
 
@@ -419,7 +419,7 @@ def generate_academic_history(students: pd.DataFrame, marks_df: pd.DataFrame,
 # ---------------------------------------------------------------------------
 def main():
     print("=" * 60)
-    print("SPIP Synthetic Data Generator")
+    print("ACADNEX Synthetic Data Generator")
     print("=" * 60)
 
     print("\n[1/7] Generating students...")

@@ -1,7 +1,7 @@
-# SPIP Ownership Guide
+# ACADNEX Ownership Guide
 
-Welcome! This is the complete, beginner-friendly manual for your project — the Student
-Performance Intelligence Platform (SPIP). It explains **every part**: how the app works, where
+Welcome! This is the complete, beginner-friendly manual for your project — the ACADNEX
+Academic Performance Intelligence Platform. It explains **every part**: how the app works, where
 everything lives, how to change things, how to deploy, and how to fix problems.
 
 You do not need prior web-development knowledge. Every term is explained the first time it

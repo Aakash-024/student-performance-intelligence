@@ -34,7 +34,7 @@ in practice.
 
 **What that means technically:** migrations 008–010 replaced the admin-only
 RLS write policies on `academic_terms`, `subjects`, `enrollments`, and
-`assessments` with policies granted to `authenticated`. SPIP only issues login
+`assessments` with policies granted to `authenticated`. The app only issues login
 accounts to staff (roles `admin` and `teacher`), so `authenticated` is the staff
 group — students do not have accounts.
 

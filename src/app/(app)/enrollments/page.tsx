@@ -70,11 +70,11 @@ export default async function EnrollmentsPage({
       <Card title="Select scope" description="Pick a term and a section, then tick the subjects they take." className="mt-5">
         <form method="get" className="flex flex-wrap items-end gap-3">
           <label className="text-sm">
-            <span className="mb-1 block font-medium text-slate-700">Term</span>
+            <span className="mb-1 block font-medium text-brand-text">Term</span>
             <select
               name="term"
               defaultValue={termId}
-              className="w-64 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500"
+              className="w-64 rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm outline-none focus:border-brand-blue"
             >
               {terms.map((term) => (
                 <option key={term.id} value={term.id}>
@@ -84,11 +84,11 @@ export default async function EnrollmentsPage({
             </select>
           </label>
           <label className="text-sm">
-            <span className="mb-1 block font-medium text-slate-700">Section</span>
+            <span className="mb-1 block font-medium text-brand-text">Section</span>
             <select
               name="section"
               defaultValue={sectionId}
-              className="w-56 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500"
+              className="w-56 rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm outline-none focus:border-brand-blue"
             >
               {sections.map((section) => (
                 <option key={section.id} value={section.id}>
@@ -99,7 +99,7 @@ export default async function EnrollmentsPage({
           </label>
           <button
             type="submit"
-            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500"
+            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
           >
             View grid
           </button>
@@ -108,7 +108,7 @@ export default async function EnrollmentsPage({
 
       {!terms.length || !sections.length || !subjects.length ? (
         <Card title="Set up first" className="mt-5">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-brand-muted">
             Create a term on the Terms page, add subjects on the Subjects page, then return here to
             enrol each section in the right subjects.
           </p>

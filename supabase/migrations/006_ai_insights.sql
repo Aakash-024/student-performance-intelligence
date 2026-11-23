@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 006: AI insights audit log (V2 Phase 4)
+-- ACADNEX Migration 006: AI insights audit log (V2 Phase 4)
 -- ============================================================================
 -- Every AI agent interaction is recorded here. The agents are advisory: they
 -- read RLS-scoped data and produce analysis, but nothing is written to

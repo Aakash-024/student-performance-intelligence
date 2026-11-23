@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 012: read-only demo viewers + staff account management
+-- ACADNEX Migration 012: read-only demo viewers + staff account management
 -- ============================================================================
 -- A new `viewer` role is for people who only want to LOOK at the project
 -- (the public demo accounts). Viewers keep full read access because every

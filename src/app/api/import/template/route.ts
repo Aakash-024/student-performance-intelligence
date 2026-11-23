@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   return new Response(`${templates[kind]}\n`, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="spip-${kind}-template.csv"`,
+      "Content-Disposition": `attachment; filename="acadnex-${kind}-template.csv"`,
       "Cache-Control": "no-store",
     },
   });

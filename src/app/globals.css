@@ -1,36 +1,109 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* ACADNEX Premium Midnight Navy tokens */
+  --color-brand-midnight: #080d1b;
+  --color-brand-navy: #0d1426;
+  --color-brand-navy-soft: #121b31;
+  --color-brand-panel: #0f182b;
+  --color-brand-border: #1c2740;
+  --color-brand-blue: #2563eb;
+  --color-brand-cyan: #22d3ee;
+  --color-brand-text: #f1f5f9;
+  --color-brand-muted: #94a3b8;
+  --color-brand-green: #22c55e;
+  --color-brand-amber: #f59e0b;
+  --color-brand-red: #ef4444;
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+  --brand-midnight: #080d1b;
+  --brand-navy: #0d1426;
+  --brand-navy-soft: #121b31;
+  --brand-panel: #0f182b;
+  --brand-border: #1c2740;
+  --brand-border-soft: rgba(148, 163, 184, 0.12);
+  --brand-blue: #2563eb;
+  --brand-cyan: #22d3ee;
+  --brand-text: #f1f5f9;
+  --brand-muted: #94a3b8;
+  --brand-green: #22c55e;
+  --brand-amber: #f59e0b;
+  --brand-red: #ef4444;
+  --brand-shadow: rgba(2, 8, 23, 0.45);
 }
 
 html {
   scroll-behavior: smooth;
+  background: var(--brand-midnight);
 }
 
 body {
-  background-color: #f5f7fb;
-  color: #0f172a;
+  min-height: 100%;
+  background:
+    radial-gradient(1100px 500px at 15% -10%, rgba(37, 99, 235, 0.14), transparent 55%),
+    radial-gradient(900px 420px at 90% 0%, rgba(34, 211, 238, 0.08), transparent 50%),
+    var(--brand-midnight);
+  color: var(--brand-text);
+  font-feature-settings: "ss01" 1, "cv01" 1;
 }
 
 ::selection {
-  background-color: #c7d2fe;
+  background: rgba(37, 99, 235, 0.45);
+  color: #ffffff;
 }
 
-/* Slim scrollbars for data tables */
+/* Slim scrollbars for dark data tables */
 .thin-scroll::-webkit-scrollbar {
   height: 8px;
   width: 8px;
 }
 .thin-scroll::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #334155;
   border-radius: 9999px;
 }
 .thin-scroll::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Subtle surface utility for cards/panels that need extra depth */
+.brand-panel {
+  background: linear-gradient(180deg, rgba(15, 24, 43, 0.98), rgba(13, 20, 38, 0.98));
+  border: 1px solid var(--brand-border);
+  box-shadow: 0 1px 0 rgba(148, 163, 184, 0.04), 0 24px 48px -24px var(--brand-shadow);
+}
+
+/* Make native form controls match the dark theme without restyling each input */
+@layer base {
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="time"] {
+    color-scheme: dark;
+  }
+  select option {
+    background: #0d1426;
+    color: #f1f5f9;
+  }
+  :focus-visible {
+    outline: 2px solid rgba(34, 211, 238, 0.55);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

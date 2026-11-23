@@ -92,11 +92,11 @@ export default async function AttendancePage({
       <Card className="mt-5" bodyClassName="px-4 py-4 sm:px-5">
         <form method="get" className="flex flex-wrap items-end gap-3">
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Term</span>
+            <span className="mb-1 block text-xs font-medium text-brand-muted">Term</span>
             <select
               name="term"
               defaultValue={params.term ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">All terms</option>
               {terms.map((term) => (
@@ -107,11 +107,11 @@ export default async function AttendancePage({
             </select>
           </label>
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Subject</span>
+            <span className="mb-1 block text-xs font-medium text-brand-muted">Subject</span>
             <select
               name="subject"
               defaultValue={params.subject ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">All subjects</option>
               {subjects.map((subject) => (
@@ -122,11 +122,11 @@ export default async function AttendancePage({
             </select>
           </label>
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Section</span>
+            <span className="mb-1 block text-xs font-medium text-brand-muted">Section</span>
             <select
               name="section"
               defaultValue={params.section ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">All sections</option>
               {sections.map((section) => (
@@ -138,17 +138,17 @@ export default async function AttendancePage({
           </label>
           <button
             type="submit"
-            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
           >
             Apply
           </button>
-          <Link href="/attendance" className="rounded-xl px-2 py-2 text-sm text-slate-500 hover:text-slate-800">
+          <Link href="/attendance" className="rounded-xl px-2 py-2 text-sm text-brand-muted hover:text-brand-text">
             Reset
           </Link>
         </form>
       </Card>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-5 overflow-hidden rounded-2xl border border-brand-border bg-brand-navy shadow-sm">
         {recent.length === 0 ? (
           <div className="p-6">
             <EmptyState
@@ -164,7 +164,7 @@ export default async function AttendancePage({
           <div className="thin-scroll overflow-x-auto">
             <table className="w-full min-w-[860px] text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-brand-border bg-brand-panel/70 text-xs uppercase tracking-wide text-brand-muted">
                   <th className="px-5 py-3 font-medium">Date</th>
                   <th className="px-3 py-3 font-medium">Subject</th>
                   <th className="px-3 py-3 font-medium">Section</th>
@@ -173,35 +173,35 @@ export default async function AttendancePage({
                   <th className="px-5 py-3 font-medium"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-brand-border">
                 {recent.map((session) => {
                   const percentage = session.student_count
                     ? (session.present_count / session.student_count) * 100
                     : 0;
                   return (
-                    <tr key={session.id} className="hover:bg-slate-50/60">
-                      <td className="px-5 py-3 text-slate-700">{formatDate(session.session_date)}</td>
+                    <tr key={session.id} className="hover:bg-brand-panel/60">
+                      <td className="px-5 py-3 text-brand-text">{formatDate(session.session_date)}</td>
                       <td className="px-3 py-3">
-                        <p className="font-medium text-slate-800">
+                        <p className="font-medium text-brand-text">
                           {subjectById.get(session.subject_id)?.code ?? "—"}
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-brand-muted">
                           {termLabel(terms.find((t) => t.id === session.academic_term_id)?.name ?? "—")}
                         </p>
                       </td>
-                      <td className="px-3 py-3 text-slate-600">
+                      <td className="px-3 py-3 text-brand-muted">
                         {sectionById.get(session.section_id)?.name ?? "—"}
                       </td>
-                      <td className="px-3 py-3 text-slate-600">P{session.period_number}</td>
+                      <td className="px-3 py-3 text-brand-muted">P{session.period_number}</td>
                       <td className="px-3 py-3">
                         <div className="w-40">
                           <div className="mb-1 flex justify-between text-xs">
-                            <span className="font-medium text-slate-700">
+                            <span className="font-medium text-brand-text">
                               {session.student_count
                                 ? `${session.present_count}/${session.student_count}`
                                 : "Not recorded"}
                             </span>
-                            <span className="text-slate-400">
+                            <span className="text-brand-muted">
                               {session.student_count ? formatPercent(percentage) : "—"}
                             </span>
                           </div>
@@ -214,7 +214,7 @@ export default async function AttendancePage({
                       <td className="px-5 py-3 text-right">
                         <Link
                           href={`/attendance/${session.id}`}
-                          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-indigo-300 hover:text-indigo-700"
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-brand-border px-3 py-1.5 text-xs font-medium text-brand-text transition hover:border-brand-cyan/60 hover:text-brand-cyan"
                         >
                           {session.student_count ? "Review" : "Mark attendance"}
                         </Link>
@@ -227,7 +227,7 @@ export default async function AttendancePage({
           </div>
         )}
       </div>
-      <p className="mt-3 text-xs text-slate-500">
+      <p className="mt-3 text-xs text-brand-muted">
         Showing the {recent.length} most recent sessions in view.
       </p>
     </div>

@@ -1,5 +1,5 @@
 """
-Database Seeder for Student Performance Intelligence Platform (SPIP)
+Database Seeder for Student Performance Intelligence Platform (ACADNEX)
 ====================================================================
 Reads synthetic CSV datasets and generates optimized batch SQL statements
 for insertion into Supabase PostgreSQL.
@@ -48,7 +48,7 @@ def generate_insert_batch(table, columns, rows, chunk_size=1000):
 
 def main():
     print("=" * 60)
-    print("Generating SPIP SQL Seed Scripts...")
+    print("Generating ACADNEX SQL Seed Scripts...")
     print("=" * 60)
 
     # 1. Departments

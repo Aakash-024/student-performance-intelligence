@@ -99,7 +99,7 @@ export default async function AssessmentDetailPage({
     <div>
       <Link
         href="/assessments"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 transition hover:text-slate-800"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-brand-muted transition hover:text-brand-text"
       >
         <ArrowLeft className="h-4 w-4" /> Back to assessments
       </Link>
@@ -118,9 +118,9 @@ export default async function AssessmentDetailPage({
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <div className="w-full max-w-sm">
-          <div className="mb-1 flex justify-between text-xs text-slate-500">
+          <div className="mb-1 flex justify-between text-xs text-brand-muted">
             <span>Coverage</span>
-            <span className="font-medium text-slate-700">
+            <span className="font-medium text-brand-text">
               {scopedStudents.length ? ((recorded / scopedStudents.length) * 100).toFixed(0) : 0}%
             </span>
           </div>
@@ -130,7 +130,7 @@ export default async function AssessmentDetailPage({
           />
         </div>
         {summary?.absent_count ? (
-          <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700 ring-1 ring-rose-200">
+          <span className="rounded-full bg-rose-500/10 px-3 py-1 text-xs font-medium text-rose-400 ring-1 ring-rose-500/25">
             {summary.absent_count} absent
           </span>
         ) : null}
@@ -139,7 +139,7 @@ export default async function AssessmentDetailPage({
       <div className="mt-5">
         {scopedStudents.length === 0 ? (
           <Card title="No students in scope">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-brand-muted">
               You are not assigned to any section for this subject in this term. Ask an administrator
               to assign the class to you.
             </p>
@@ -156,32 +156,32 @@ export default async function AssessmentDetailPage({
         bodyClassName="px-0 py-0"
       >
         {audit.length === 0 ? (
-          <p className="px-5 py-4 text-sm text-slate-500">No corrections recorded yet.</p>
+          <p className="px-5 py-4 text-sm text-brand-muted">No corrections recorded yet.</p>
         ) : (
           <div className="thin-scroll overflow-x-auto">
             <table className="w-full min-w-[560px] text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wide text-slate-500">
+                <tr className="border-b border-brand-border bg-brand-panel/70 text-xs uppercase tracking-wide text-brand-muted">
                   <th className="px-5 py-3 font-medium">Student</th>
                   <th className="px-3 py-3 font-medium">Change</th>
                   <th className="px-3 py-3 font-medium">Edited by</th>
                   <th className="px-5 py-3 font-medium">When</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-brand-border">
                 {audit.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-slate-50/70">
-                    <td className="px-5 py-3 text-slate-700">
+                  <tr key={entry.id} className="hover:bg-brand-panel/70">
+                    <td className="px-5 py-3 text-brand-text">
                       {studentById.get(entry.student_id) ?? "Student"}
                     </td>
-                    <td className="px-3 py-3 text-slate-600">
+                    <td className="px-3 py-3 text-brand-muted">
                       {entry.old_is_absent ? "Absent" : Number(entry.old_marks).toFixed(1)} →{" "}
                       {entry.new_is_absent ? "Absent" : Number(entry.new_marks).toFixed(1)}
                     </td>
-                    <td className="px-3 py-3 text-slate-600">
+                    <td className="px-3 py-3 text-brand-muted">
                       {entry.actor_role}
                     </td>
-                    <td className="px-5 py-3 text-slate-500">{formatDate(entry.created_at)}</td>
+                    <td className="px-5 py-3 text-brand-muted">{formatDate(entry.created_at)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,5 +1,5 @@
 /**
- * SPIP deterministic reseed script.
+ * ACADNEX deterministic reseed script.
  *
  * Reads the synthetic CSVs in data/generated and writes them to Supabase over
  * the PostgREST API using the server-only secret key. It wipes the academic
@@ -157,7 +157,7 @@ async function count(table) {
 }
 
 async function main() {
-  console.log("SPIP reseed ->", BASE);
+  console.log("ACADNEX reseed ->", BASE);
   console.log("1. Wipe");
   await wipe();
 

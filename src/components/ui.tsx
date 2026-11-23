@@ -15,8 +15,8 @@ export function PageHeader({
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{title}</h1>
-        {description ? <p className="mt-1 text-sm text-slate-500">{description}</p> : null}
+        <h1 className="text-2xl font-semibold tracking-tight text-brand-text">{title}</h1>
+        {description ? <p className="mt-1 text-sm text-brand-muted">{description}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </div>
@@ -41,15 +41,15 @@ export function Card({
   return (
     <section
       className={cn(
-        "rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/[0.03]",
+        "brand-panel rounded-2xl",
         className,
       )}
     >
       {title || action ? (
-        <div className="flex items-start justify-between gap-3 border-b border-slate-100 px-5 py-4">
+        <div className="flex items-start justify-between gap-3 border-b border-brand-border px-5 py-4">
           <div>
-            {title ? <h2 className="text-sm font-semibold text-slate-900">{title}</h2> : null}
-            {description ? <p className="mt-0.5 text-xs text-slate-500">{description}</p> : null}
+            {title ? <h2 className="text-sm font-semibold text-brand-text">{title}</h2> : null}
+            {description ? <p className="mt-0.5 text-xs text-brand-muted">{description}</p> : null}
           </div>
           {action}
         </div>
@@ -60,12 +60,12 @@ export function Card({
 }
 
 const tones = {
-  indigo: "bg-indigo-50 text-indigo-600 ring-indigo-500/10",
-  emerald: "bg-emerald-50 text-emerald-600 ring-emerald-500/10",
-  amber: "bg-amber-50 text-amber-600 ring-amber-500/10",
-  rose: "bg-rose-50 text-rose-600 ring-rose-500/10",
-  slate: "bg-slate-100 text-slate-600 ring-slate-500/10",
-  sky: "bg-sky-50 text-sky-600 ring-sky-500/10",
+  indigo: "bg-brand-blue/15 text-brand-cyan ring-brand-blue/30",
+  emerald: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/25",
+  amber: "bg-amber-500/10 text-amber-400 ring-amber-500/25",
+  rose: "bg-rose-500/10 text-rose-400 ring-rose-500/25",
+  slate: "bg-slate-500/10 text-brand-muted ring-slate-400/20",
+  sky: "bg-sky-500/10 text-sky-400 ring-sky-500/25",
 };
 
 export function StatCard({
@@ -82,17 +82,17 @@ export function StatCard({
   tone?: keyof typeof tones;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/[0.03]">
+    <div className="brand-panel rounded-2xl p-5 transition hover:border-brand-blue/40">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">{value}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-brand-muted">{label}</p>
+          <p className="mt-2 text-2xl font-semibold tracking-tight text-brand-text">{value}</p>
         </div>
         <span className={cn("grid h-10 w-10 place-items-center rounded-xl ring-1", tones[tone])}>
           <Icon className="h-5 w-5" />
         </span>
       </div>
-      {hint ? <div className="mt-3 text-xs text-slate-500">{hint}</div> : null}
+      {hint ? <div className="mt-3 text-xs text-brand-muted">{hint}</div> : null}
     </div>
   );
 }
@@ -141,23 +141,30 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/60 px-6 py-12 text-center">
-      <p className="text-sm font-medium text-slate-700">{title}</p>
-      {description ? <p className="mt-1 max-w-md text-sm text-slate-500">{description}</p> : null}
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-brand-border bg-brand-panel/60 px-6 py-12 text-center">
+      <span className="h-1.5 w-10 rounded-full bg-brand-cyan/60" aria-hidden />
+      <p className="mt-4 text-sm font-medium text-brand-text">{title}</p>
+      {description ? <p className="mt-1 max-w-md text-sm text-brand-muted">{description}</p> : null}
       {action ? <div className="mt-4">{action}</div> : null}
     </div>
   );
 }
 
-export function ProgressBar({ value, tone = "indigo" }: { value: number; tone?: "indigo" | "emerald" | "amber" | "rose" }) {
+export function ProgressBar({
+  value,
+  tone = "indigo",
+}: {
+  value: number;
+  tone?: "indigo" | "emerald" | "amber" | "rose";
+}) {
   const colors = {
-    indigo: "bg-indigo-500",
+    indigo: "bg-brand-blue",
     emerald: "bg-emerald-500",
     amber: "bg-amber-500",
     rose: "bg-rose-500",
   };
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-brand-navy-soft">
       <div
         className={cn("h-full rounded-full", colors[tone])}
         style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
@@ -173,8 +180,8 @@ export function ProgressBar({ value, tone = "indigo" }: { value: number; tone?: 
  */
 export function ReadOnlyNote({ what = "editing" }: { what?: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 px-4 py-3 text-sm text-slate-500">
-      <Eye className="h-4 w-4 shrink-0 text-slate-400" />
+    <div className="flex items-center gap-2 rounded-xl border border-dashed border-brand-border bg-brand-panel/60 px-4 py-3 text-sm text-brand-muted">
+      <Eye className="h-4 w-4 shrink-0 text-brand-muted" />
       <span>
         Demo accounts have view-only access — {what} is disabled. Sign in with a staff account to
         make changes.

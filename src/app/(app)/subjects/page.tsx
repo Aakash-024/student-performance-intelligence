@@ -82,7 +82,7 @@ export default async function SubjectsPage() {
 
       <div className="mt-5 grid gap-5 xl:grid-cols-2">
         <Card title="Average vs pass rate" description={`${termLabel(currentTerm?.name ?? "Current term")} · all subjects`}>
-          {chartData.length ? <SubjectBarChart data={chartData} /> : <p className="py-10 text-center text-sm text-slate-500">No assessment data yet.</p>}
+          {chartData.length ? <SubjectBarChart data={chartData} /> : <p className="py-10 text-center text-sm text-brand-muted">No assessment data yet.</p>}
         </Card>
         <Card title="Semester trend" description="Average subject score by semester">
           <TermTrendChart data={termTrend.map((row) => ({ ...row, attendance: row.avg }))} />
@@ -91,24 +91,24 @@ export default async function SubjectsPage() {
 
       <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {subjectRows.map(({ subject, currentRow, history }) => (
-          <div key={subject.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div key={subject.id} className="rounded-2xl border border-brand-border bg-brand-navy p-5 shadow-sm">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">{subject.code}</p>
-                <h2 className="mt-0.5 text-sm font-semibold text-slate-900">{subject.name}</h2>
-                <p className="mt-1 text-xs capitalize text-slate-500">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand-cyan">{subject.code}</p>
+                <h2 className="mt-0.5 text-sm font-semibold text-brand-text">{subject.name}</h2>
+                <p className="mt-1 text-xs capitalize text-brand-muted">
                   {subject.type} · {subject.credits} credits
                 </p>
               </div>
-              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+              <span className="rounded-full bg-brand-navy-soft px-2.5 py-1 text-xs font-medium text-brand-muted">
                 {currentRow ? formatPercent(currentRow.avg_percentage) : "—"}
               </span>
             </div>
 
             <div className="mt-4">
-              <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
+              <div className="mb-1 flex items-center justify-between text-xs text-brand-muted">
                 <span>Pass rate</span>
-                <span className="font-medium text-slate-700">
+                <span className="font-medium text-brand-text">
                   {currentRow ? formatPercent(currentRow.pass_rate) : "—"}
                 </span>
               </div>
@@ -118,7 +118,7 @@ export default async function SubjectsPage() {
               />
             </div>
 
-            <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+            <div className="mt-3 flex items-center justify-between text-xs text-brand-muted">
               <span>{currentRow?.marks_count ?? 0} marks recorded</span>
               <span>
                 {history.map((row) => `${row.term} ${row.avg}%`).join(" · ")}

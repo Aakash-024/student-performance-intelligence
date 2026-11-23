@@ -1,5 +1,5 @@
 """
-SPIP Phase 5: ML model training pipeline.
+ACADNEX Phase 5: ML model training pipeline.
 
 Trains two explainable models on the synthetic dataset in data/generated/:
 

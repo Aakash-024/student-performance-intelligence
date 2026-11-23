@@ -81,7 +81,7 @@ export default async function TeachersPage() {
                 action={<Badge tone="slate">{rows.length} classes</Badge>}
               >
                 {rows.length === 0 ? (
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-brand-muted">
                     No classes assigned yet. Use the form below to grant grading access.
                   </p>
                 ) : (
@@ -93,13 +93,13 @@ export default async function TeachersPage() {
                       return (
                         <li
                           key={assignment.id}
-                          className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 py-1.5 pl-3 pr-1.5 text-xs text-slate-700"
+                          className="flex items-center gap-2 rounded-xl border border-brand-border bg-brand-panel py-1.5 pl-3 pr-1.5 text-xs text-brand-text"
                         >
                           <span className="font-medium">
                             {subject?.code ?? "—"} · Section {section?.name ?? "—"}
                           </span>
-                          <span className="text-slate-400">·</span>
-                          <span className="text-slate-500">
+                          <span className="text-brand-muted">·</span>
+                          <span className="text-brand-muted">
                             {termLabel(term?.name ?? "—")}
                           </span>
                           <RemoveAssignmentButton id={assignment.id} />
@@ -121,7 +121,7 @@ export default async function TeachersPage() {
         )}
       </div>
 
-      <p className="mt-4 text-xs text-slate-500">
+      <p className="mt-4 text-xs text-brand-muted">
         Assignments are enforced in Postgres: RLS policies only allow a teacher to write marks and
         attendance for the subject, section, and term rows listed above.
       </p>

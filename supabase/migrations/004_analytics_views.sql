@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 004: Analytics views
+-- ACADNEX Migration 004: Analytics views
 -- ============================================================================
 -- All views use security_invoker so the caller's RLS policies still apply.
 -- Mark percentages are weighted by each assessment's weightage_percent.

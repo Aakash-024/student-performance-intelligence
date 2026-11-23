@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 005: Assessment summary view
+-- ACADNEX Migration 005: Assessment summary view
 -- ============================================================================
 -- One row per assessment with recorded-mark statistics, so the assessments
 -- screen can show coverage and averages without loading every mark row.

@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 003: Teacher assignments + access-control hardening
+-- ACADNEX Migration 003: Teacher assignments + access-control hardening
 -- ============================================================================
 -- Adds an explicit teacher -> (subject, section, term) assignment table so
 -- teachers only write marks/attendance for classes they actually teach.

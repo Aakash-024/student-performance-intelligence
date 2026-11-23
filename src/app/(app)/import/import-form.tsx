@@ -29,16 +29,16 @@ const emptyPreview: PreviewState = {
 const emptyCommit: CommitState = {};
 
 const statusStyle: Record<ImportStatus, string> = {
-  ready: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  update: "bg-sky-50 text-sky-700 ring-sky-200",
-  error: "bg-rose-50 text-rose-700 ring-rose-200",
-  skipped: "bg-amber-50 text-amber-700 ring-amber-200",
+  ready: "bg-emerald-500/10 text-emerald-400 ring-emerald-200",
+  update: "bg-sky-500/10 text-sky-400 ring-sky-500/25",
+  error: "bg-rose-500/10 text-rose-400 ring-rose-500/25",
+  skipped: "bg-amber-500/10 text-amber-400 ring-amber-200",
 };
 
 function ErrorMessage({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="flex items-start gap-2 rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200">
+    <p className="flex items-start gap-2 rounded-xl bg-rose-500/10 px-3 py-2 text-sm text-rose-400 ring-1 ring-rose-500/25">
       <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {message}
     </p>
   );
@@ -47,7 +47,7 @@ function ErrorMessage({ message }: { message?: string }) {
 function SuccessMessage({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="flex items-start gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700 ring-1 ring-emerald-200">
+    <p className="flex items-start gap-2 rounded-xl bg-emerald-500/10 px-3 py-2 text-sm text-emerald-400 ring-1 ring-emerald-200">
       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> {message}
     </p>
   );
@@ -55,9 +55,9 @@ function SuccessMessage({ message }: { message?: string }) {
 
 function PreviewTable({ rows }: { rows: ImportRowView[] }) {
   return (
-    <div className="thin-scroll mt-3 max-h-96 overflow-auto rounded-xl border border-slate-200">
+    <div className="thin-scroll mt-3 max-h-96 overflow-auto rounded-xl border border-brand-border">
       <table className="w-full min-w-[560px] text-left text-sm">
-        <thead className="sticky top-0 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+        <thead className="sticky top-0 bg-brand-panel text-xs uppercase tracking-wide text-brand-muted">
           <tr>
             <th className="px-3 py-2 font-medium">Line</th>
             <th className="px-3 py-2 font-medium">Record</th>
@@ -65,24 +65,24 @@ function PreviewTable({ rows }: { rows: ImportRowView[] }) {
             <th className="px-3 py-2 font-medium">Result</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-brand-border">
           {rows.slice(0, 100).map((row) => (
-            <tr key={row.line} className="bg-white">
-              <td className="px-3 py-2 text-slate-400">{row.line}</td>
-              <td className="px-3 py-2 font-medium text-slate-800">{row.label}</td>
-              <td className="px-3 py-2 text-xs text-slate-500">{row.detail}</td>
+            <tr key={row.line} className="bg-brand-navy">
+              <td className="px-3 py-2 text-brand-muted">{row.line}</td>
+              <td className="px-3 py-2 font-medium text-brand-text">{row.label}</td>
+              <td className="px-3 py-2 text-xs text-brand-muted">{row.detail}</td>
               <td className="px-3 py-2">
                 <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ring-1 ${statusStyle[row.status]}`}>
                   {row.status}
                 </span>
-                <span className="ml-2 text-xs text-slate-500">{row.message}</span>
+                <span className="ml-2 text-xs text-brand-muted">{row.message}</span>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       {rows.length > 100 ? (
-        <p className="border-t border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+        <p className="border-t border-brand-border bg-brand-panel px-3 py-2 text-xs text-brand-muted">
           Showing the first 100 of {rows.length} rows. All valid rows will be imported.
         </p>
       ) : null}
@@ -128,42 +128,42 @@ function ImportFlow({ kind }: { kind: "students" | "marks" }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-brand-border bg-brand-navy p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-slate-900">
+            <h2 className="text-sm font-semibold text-brand-text">
               {isStudents ? "Student list" : "Marks list"}
             </h2>
-            <p className="mt-1 max-w-2xl text-xs text-slate-500">{help}</p>
-            <code className="mt-2 block break-all rounded-lg bg-slate-50 px-2 py-1.5 text-[11px] text-slate-600">
+            <p className="mt-1 max-w-2xl text-xs text-brand-muted">{help}</p>
+            <code className="mt-2 block break-all rounded-lg bg-brand-panel px-2 py-1.5 text-[11px] text-brand-muted">
               {columns}
             </code>
           </div>
           <a
             href={`/api/import/template?type=${kind}`}
             download
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-indigo-300 hover:text-indigo-600"
+            className="inline-flex items-center gap-2 rounded-xl border border-brand-border px-3 py-2 text-xs font-medium text-brand-muted transition hover:border-brand-cyan/60 hover:text-brand-cyan"
           >
             <Download className="h-3.5 w-3.5" /> Download template
           </a>
         </div>
 
-        <div className="mt-4 border-t border-slate-100 pt-4">
+        <div className="mt-4 border-t border-brand-border pt-4">
           <form action={handlePreview} className="flex flex-wrap items-end gap-3">
             <label className="min-w-64 flex-1 text-sm">
-              <span className="mb-1 block font-medium text-slate-700">CSV file</span>
+              <span className="mb-1 block font-medium text-brand-text">CSV file</span>
               <input
                 type="file"
                 name="file"
                 accept=".csv,text/csv"
                 required
-                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-3 file:py-1.5 file:text-white"
+                className="w-full rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-brand-blue file:px-3 file:py-1.5 file:text-white"
               />
             </label>
             <button
               type="submit"
               disabled={previewing}
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-70"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-4 py-2.5 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-70"
             >
               {previewing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
               {previewing ? "Checking…" : "Validate file"}
@@ -178,19 +178,19 @@ function ImportFlow({ kind }: { kind: "students" | "marks" }) {
       </div>
 
       {preview.rows.length ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-brand-border bg-brand-navy p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700">
+              <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 font-medium text-emerald-400">
                 {preview.counts.ready} new
               </span>
-              <span className="rounded-full bg-sky-50 px-2.5 py-1 font-medium text-sky-700">
+              <span className="rounded-full bg-sky-500/10 px-2.5 py-1 font-medium text-sky-400">
                 {preview.counts.update} update
               </span>
-              <span className="rounded-full bg-amber-50 px-2.5 py-1 font-medium text-amber-700">
+              <span className="rounded-full bg-amber-500/10 px-2.5 py-1 font-medium text-amber-400">
                 {preview.counts.skipped} skipped
               </span>
-              <span className="rounded-full bg-rose-50 px-2.5 py-1 font-medium text-rose-700">
+              <span className="rounded-full bg-rose-500/10 px-2.5 py-1 font-medium text-rose-400">
                 {preview.counts.error} errors
               </span>
             </div>
@@ -200,7 +200,7 @@ function ImportFlow({ kind }: { kind: "students" | "marks" }) {
                 <button
                   type="submit"
                   disabled={committing || valid === 0}
-                  className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:opacity-70"
+                  className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white transition hover:brightness-110 disabled:opacity-70"
                 >
                   {committing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSpreadsheet className="h-4 w-4" />}
                   {committing ? "Importing…" : `Import ${valid} valid row${valid === 1 ? "" : "s"}`}
@@ -208,7 +208,7 @@ function ImportFlow({ kind }: { kind: "students" | "marks" }) {
               </form>
             ) : null}
           </div>
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-brand-muted">
             The file is validated again when you click Import. Rows with errors or skipped rows are not written.
           </p>
           <PreviewTable rows={preview.rows} />
@@ -223,14 +223,14 @@ export function ImportForm() {
 
   return (
     <div>
-      <div className="mb-5 inline-flex rounded-xl bg-slate-100 p-1">
+      <div className="mb-5 inline-flex rounded-xl bg-brand-navy-soft p-1">
         {(["students", "marks"] as const).map((value) => (
           <button
             key={value}
             type="button"
             onClick={() => setTab(value)}
             className={`rounded-lg px-4 py-2 text-sm font-medium capitalize transition ${
-              tab === value ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              tab === value ? "bg-brand-navy text-brand-text shadow-sm" : "text-brand-muted hover:text-brand-text"
             }`}
           >
             {value}

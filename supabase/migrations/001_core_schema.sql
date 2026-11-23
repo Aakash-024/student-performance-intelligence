@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 001: Core Schema
+-- ACADNEX Migration 001: Core Schema
 -- Student Performance Intelligence Platform
 -- ============================================================================
 -- This migration creates all core tables, constraints, indexes, and functions.

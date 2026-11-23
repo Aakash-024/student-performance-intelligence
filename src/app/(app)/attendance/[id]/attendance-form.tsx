@@ -55,13 +55,13 @@ export function AttendanceForm({
         />
       ))}
 
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+      <div className="rounded-2xl border border-brand-border bg-brand-navy shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-brand-border px-5 py-4">
           <div>
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-semibold text-brand-text">
               {presentCount} of {students.length} present · {percentage.toFixed(0)}%
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-brand-muted">
               {students.some((student) => student.recorded)
                 ? "Editing saved attendance for this session."
                 : "No attendance saved yet — everyone starts marked present."}
@@ -72,14 +72,14 @@ export function AttendanceForm({
               <button
                 type="button"
                 onClick={() => setAll(true)}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+                className="rounded-lg border border-brand-border px-3 py-1.5 text-xs font-medium text-brand-muted transition hover:bg-brand-panel"
               >
                 Mark all present
               </button>
               <button
                 type="button"
                 onClick={() => setAll(false)}
-                className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+                className="rounded-lg border border-brand-border px-3 py-1.5 text-xs font-medium text-brand-muted transition hover:bg-brand-panel"
               >
                 Mark all absent
               </button>
@@ -88,24 +88,24 @@ export function AttendanceForm({
         </div>
 
         <div className="thin-scroll max-h-[560px] overflow-y-auto">
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-brand-border">
             {students.map((student) => {
               const isPresent = present[student.id];
               return (
                 <li
                   key={student.id}
-                  className="flex items-center justify-between gap-3 px-5 py-2.5 hover:bg-slate-50/60"
+                  className="flex items-center justify-between gap-3 px-5 py-2.5 hover:bg-brand-panel/60"
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-800">{student.name}</p>
-                    <p className="text-xs text-slate-500">{student.register_number}</p>
+                    <p className="truncate text-sm font-medium text-brand-text">{student.name}</p>
+                    <p className="text-xs text-brand-muted">{student.register_number}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <span
                       className={
                         isPresent
-                          ? "text-xs font-medium text-emerald-600"
-                          : "text-xs font-medium text-rose-600"
+                          ? "text-xs font-medium text-emerald-400"
+                          : "text-xs font-medium text-rose-400"
                       }
                     >
                       {isPresent ? "Present" : "Absent"}
@@ -124,7 +124,7 @@ export function AttendanceForm({
                       }`}
                     >
                       <span
-                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-brand-navy shadow transition-all ${
                           isPresent ? "left-[22px]" : "left-0.5"
                         }`}
                       />
@@ -138,18 +138,18 @@ export function AttendanceForm({
       </div>
 
       {state.error ? (
-        <p className="mt-3 flex items-start gap-2 rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200">
+        <p className="mt-3 flex items-start gap-2 rounded-xl bg-rose-500/10 px-3 py-2 text-sm text-rose-400 ring-1 ring-rose-500/25">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> {state.error}
         </p>
       ) : null}
       {state.success ? (
-        <p className="mt-3 flex items-start gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700 ring-1 ring-emerald-200">
+        <p className="mt-3 flex items-start gap-2 rounded-xl bg-emerald-500/10 px-3 py-2 text-sm text-emerald-400 ring-1 ring-emerald-200">
           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> {state.success}
         </p>
       ) : null}
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-brand-muted">
           {editable
             ? "Saving upserts one attendance record per student in this session."
             : "You can view this session but you are not assigned to this class, so the database blocks writes."}
@@ -157,7 +157,7 @@ export function AttendanceForm({
         <button
           type="submit"
           disabled={pending || !editable}
-          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {pending ? "Saving…" : "Save attendance"}

@@ -80,7 +80,7 @@ export default async function AttendanceDetailPage({
     <div>
       <Link
         href="/attendance"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-slate-500 transition hover:text-slate-800"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm text-brand-muted transition hover:text-brand-text"
       >
         <ArrowLeft className="h-4 w-4" /> Back to attendance
       </Link>
@@ -98,9 +98,9 @@ export default async function AttendanceDetailPage({
       </div>
 
       <div className="mt-4 w-full max-w-sm">
-        <div className="mb-1 flex justify-between text-xs text-slate-500">
+        <div className="mb-1 flex justify-between text-xs text-brand-muted">
           <span>Session attendance</span>
-          <span className="font-medium text-slate-700">{formatPercent(percentage)}</span>
+          <span className="font-medium text-brand-text">{formatPercent(percentage)}</span>
         </div>
         <ProgressBar value={percentage} tone={percentage < 60 ? "rose" : percentage < 80 ? "amber" : "emerald"} />
       </div>
@@ -108,7 +108,7 @@ export default async function AttendanceDetailPage({
       <div className="mt-5">
         {rows.length === 0 ? (
           <Card title="No students in this section">
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-brand-muted">
               Add students to section {section?.name ?? "—"} before taking attendance.
             </p>
           </Card>
