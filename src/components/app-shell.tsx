@@ -19,10 +19,12 @@ import {
   Menu,
   ShieldCheck,
   UserCog,
+  UserRound,
   Users,
   X,
 } from "lucide-react";
 import { signOut } from "@/app/login/actions";
+import { BrandLogo } from "@/components/brand";
 import { cn, initials } from "@/lib/utils";
 import type { Profile } from "@/lib/types";
 
@@ -39,6 +41,7 @@ const nav = [
   { href: "/activity", label: "Activity", icon: History, staffOnly: true },
   { href: "/teachers", label: "Teachers", icon: GraduationCap, adminOnly: true },
   { href: "/accounts", label: "Accounts", icon: UserCog, adminOnly: true },
+  { href: "/profile", label: "Profile", icon: UserRound },
 ];
 
 function NavLinks({ profile, onNavigate }: { profile: Profile; onNavigate?: () => void }) {
@@ -62,17 +65,18 @@ function NavLinks({ profile, onNavigate }: { profile: Profile; onNavigate?: () =
               className={cn(
                 "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
                 active
-                  ? "bg-white/10 text-white ring-1 ring-white/10"
-                  : "text-slate-400 hover:bg-white/5 hover:text-slate-100",
+                  ? "bg-brand-blue/15 text-white ring-1 ring-brand-cyan/25"
+                  : "text-brand-muted hover:bg-white/5 hover:text-brand-text",
               )}
             >
               <Icon
                 className={cn(
                   "h-4.5 w-4.5 shrink-0",
-                  active ? "text-indigo-300" : "text-slate-500 group-hover:text-slate-300",
+                  active ? "text-brand-cyan" : "text-brand-muted group-hover:text-brand-muted",
                 )}
               />
               {label}
+              {active ? <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-cyan" /> : null}
             </Link>
           );
         })}
@@ -82,14 +86,8 @@ function NavLinks({ profile, onNavigate }: { profile: Profile; onNavigate?: () =
 
 function Brand() {
   return (
-    <Link href="/dashboard" className="flex items-center gap-3">
-      <span className="grid h-10 w-10 place-items-center rounded-xl bg-indigo-500 text-white shadow-lg shadow-indigo-950/40">
-        <GraduationCap className="h-5 w-5" />
-      </span>
-      <span>
-        <span className="block text-sm font-semibold tracking-[0.18em] text-white">SPIP</span>
-        <span className="block text-[11px] text-slate-400">Performance intelligence</span>
-      </span>
+    <Link href="/dashboard" className="flex items-center" aria-label="ACADNEX dashboard">
+      <BrandLogo size={38} showTagline={false} title="ACADNEX" />
     </Link>
   );
 }
@@ -98,18 +96,18 @@ function UserCard({ profile }: { profile: Profile }) {
   return (
     <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
       <div className="flex items-center gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-indigo-500/20 text-xs font-semibold text-indigo-200 ring-1 ring-indigo-400/30">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-blue/20 text-xs font-semibold text-brand-cyan ring-1 ring-brand-blue/40">
           {initials(profile.full_name || profile.email)}
         </span>
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-white">{profile.full_name}</p>
-          <p className="flex items-center gap-1 truncate text-[11px] text-slate-400">
+          <p className="flex items-center gap-1 truncate text-[11px] text-brand-muted">
             {profile.role === "admin" ? (
-              <ShieldCheck className="h-3 w-3 text-indigo-300" />
+              <ShieldCheck className="h-3 w-3 text-brand-cyan" />
             ) : profile.role === "teacher" ? (
-              <GraduationCap className="h-3 w-3 text-emerald-300" />
+              <GraduationCap className="h-3 w-3 text-emerald-400" />
             ) : (
-              <Eye className="h-3 w-3 text-amber-300" />
+              <Eye className="h-3 w-3 text-amber-400" />
             )}
             {profile.role === "admin"
               ? "Administrator"
@@ -122,7 +120,7 @@ function UserCard({ profile }: { profile: Profile }) {
       <form action={signOut} className="mt-3">
         <button
           type="submit"
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs font-medium text-brand-muted ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white"
         >
           <LogOut className="h-3.5 w-3.5" /> Sign out
         </button>
@@ -147,10 +145,10 @@ export function AppShell({
 
   return (
     <div className="min-h-screen">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-slate-950 px-4 py-5 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-brand-border bg-[var(--brand-navy)] px-4 py-5 lg:flex">
         <Brand />
         <div className="mt-8 flex-1 overflow-y-auto">
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted">
             Workspace
           </p>
           <NavLinks profile={profile} />
@@ -158,12 +156,12 @@ export function AppShell({
         <UserCard profile={profile} />
       </aside>
 
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-800 bg-slate-950 px-4 py-3 lg:hidden">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-brand-border bg-[var(--brand-navy)]/95 px-4 py-3 backdrop-blur lg:hidden">
         <Brand />
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="rounded-lg border border-white/10 p-2 text-slate-300"
+          className="rounded-lg border border-white/10 p-2 text-brand-muted"
           aria-label="Open navigation"
         >
           <Menu className="h-5 w-5" />
@@ -175,16 +173,16 @@ export function AppShell({
           <button
             type="button"
             aria-label="Close navigation"
-            className="absolute inset-0 bg-slate-950/50"
+            className="absolute inset-0 bg-[var(--brand-midnight)]/70"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-slate-950 px-4 py-5">
+          <div className="absolute inset-y-0 left-0 flex w-72 flex-col border-r border-brand-border bg-[var(--brand-navy)] px-4 py-5">
             <div className="flex items-center justify-between">
               <Brand />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-white"
+                className="rounded-lg p-2 text-brand-muted hover:bg-white/5 hover:text-white"
                 aria-label="Close navigation"
               >
                 <X className="h-5 w-5" />
@@ -200,7 +198,7 @@ export function AppShell({
 
       <main className="lg:pl-64">
         {profile.role === "viewer" ? (
-          <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-center text-xs font-medium text-amber-800 lg:px-8">
+          <div className="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2.5 text-center text-xs font-medium text-amber-300 lg:px-8">
             <Eye className="mr-1.5 inline h-3.5 w-3.5" />
             Demo account — everything here is read-only. Sign in with a staff account to make changes.
           </div>

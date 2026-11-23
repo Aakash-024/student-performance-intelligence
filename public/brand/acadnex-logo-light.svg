@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 64" role="img" aria-label="ACADNEX — Academic Intelligence. Elevated.">
+  <rect width="64" height="64" rx="14" fill="#0D1426"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="13.25" fill="none" stroke="#2563EB" stroke-opacity=".45" stroke-width="1.5"/>
+  <rect x="13" y="36" width="8" height="15" rx="2.5" fill="#2563EB"/>
+  <rect x="27" y="28" width="8" height="23" rx="2.5" fill="#2563EB"/>
+  <rect x="41" y="18" width="8" height="33" rx="2.5" fill="#22D3EE"/>
+  <path d="M14 41 L28 31 L43 21 L52 10" fill="none" stroke="#22D3EE" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="28" cy="31" r="2.6" fill="#F1F5F9"/>
+  <circle cx="52" cy="10" r="3.6" fill="#22D3EE"/>
+  <text x="80" y="36" fill="#080D1B" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="29" font-weight="800" letter-spacing="1.6">ACADNEX</text>
+  <text x="81" y="53" fill="#2563EB" font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="9" font-weight="600" letter-spacing="2.4">ACADEMIC INTELLIGENCE</text>
+</svg>

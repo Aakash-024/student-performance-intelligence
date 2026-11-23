@@ -11,6 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import {
   average,
+  getRecentActivity,
   getSectionPerformance,
   getSections,
   getStudentOverview,
@@ -19,7 +20,7 @@ import {
   getTerms,
 } from "@/lib/data";
 import type { Indicator, StudentOverview } from "@/lib/types";
-import { formatPercent, INDICATOR_ORDER, indicatorMeta, termLabel } from "@/lib/utils";
+import { formatDate, formatPercent, INDICATOR_ORDER, indicatorMeta, termLabel } from "@/lib/utils";
 import {
   CHART_COLORS,
   IndicatorDonut,
@@ -44,7 +45,7 @@ export default async function DashboardPage() {
   const current = await getCurrentUser();
   const isTeacher = current?.profile?.role === "teacher";
 
-  const [terms, sections, overview, subjectPerf, sectionPerf, termScores, marksCount, attendanceCount] =
+  const [terms, sections, overview, subjectPerf, sectionPerf, termScores, marksCount, attendanceCount, recentActivity] =
     await Promise.all([
       getTerms(supabase),
       getSections(supabase),
@@ -56,6 +57,7 @@ export default async function DashboardPage() {
         .select("academic_term_id, student_id, avg_percentage, attendance_percentage"),
       supabase.from("marks").select("*", { count: "exact", head: true }),
       supabase.from("attendance_records").select("*", { count: "exact", head: true }),
+      getRecentActivity(supabase, 6),
     ]);
 
   const teacherCtx =
@@ -167,13 +169,13 @@ export default async function DashboardPage() {
           <>
             <Link
               href="/assessments"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+              className="inline-flex items-center gap-2 rounded-xl border border-brand-border bg-brand-navy px-3.5 py-2 text-sm font-medium text-brand-text shadow-sm transition hover:border-brand-border hover:bg-brand-panel"
             >
               <ClipboardList className="h-4 w-4" /> Enter marks
             </Link>
             <Link
               href="/attendance"
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-blue px-3.5 py-2 text-sm font-medium text-white shadow-sm transition hover:brightness-110"
             >
               <CalendarCheck className="h-4 w-4" /> Take attendance
             </Link>
@@ -181,7 +183,7 @@ export default async function DashboardPage() {
         }
       />
 
-      <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+      <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-brand-muted">
         <span className="inline-flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           Live database
@@ -260,16 +262,16 @@ export default async function DashboardPage() {
           action={
             <Link
               href="/students?indicator=at_risk"
-              className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-cyan hover:text-brand-cyan"
             >
               View all <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           }
           bodyClassName="px-0 py-0"
         >
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-brand-border">
             {watchlist.length === 0 ? (
-              <p className="px-5 py-8 text-center text-sm text-slate-500">
+              <p className="px-5 py-8 text-center text-sm text-brand-muted">
                 No at-risk students in this scope.
               </p>
             ) : (
@@ -279,25 +281,59 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-2">
+      <div className="mt-5 grid gap-5 xl:grid-cols-3">
         <Card
           title="Top performers"
           description="Highest overall averages this term"
           action={
             <Link
               href="/students?indicator=high_performer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-cyan hover:text-white"
             >
               View all <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           }
           bodyClassName="px-0 py-0"
         >
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-brand-border">
             {topPerformers.map((student) => (
               <StudentRow key={student.student_id} student={student} />
             ))}
           </div>
+        </Card>
+
+        <Card
+          title="Recent updates"
+          description="Latest academic changes from the audit log"
+          action={
+            <Link
+              href="/activity"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-cyan hover:text-white"
+            >
+              View log <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          }
+          bodyClassName="px-0 py-0"
+        >
+          {recentActivity.length === 0 ? (
+            <p className="px-5 py-8 text-center text-sm text-brand-muted">
+              No recorded updates yet — changes made in ACADNEX will appear here.
+            </p>
+          ) : (
+            <ul className="divide-y divide-brand-border">
+              {recentActivity.map((entry) => (
+                <li key={entry.id} className="flex items-start gap-3 px-5 py-3">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-cyan" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-brand-text">{entry.summary}</p>
+                    <p className="mt-0.5 text-xs text-brand-muted">
+                      {entry.actor_name} · {formatDate(entry.created_at)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
 
         <Card title="How indicators work" description="Deterministic rules — no black box">
@@ -312,8 +348,8 @@ export default async function DashboardPage() {
               <div key={label} className="flex items-start gap-3">
                 <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${dot}`} />
                 <div>
-                  <p className="font-medium text-slate-800">{label}</p>
-                  <p className="text-slate-500">{rule}</p>
+                  <p className="font-medium text-brand-text">{label}</p>
+                  <p className="text-brand-muted">{rule}</p>
                 </div>
               </div>
             ))}
@@ -328,24 +364,24 @@ function StudentRow({ student }: { student: StudentOverview }) {
   return (
     <Link
       href={`/students/${student.student_id}`}
-      className="flex items-center justify-between gap-3 px-5 py-3 transition hover:bg-slate-50"
+      className="flex items-center justify-between gap-3 px-5 py-3 transition hover:bg-brand-panel"
     >
       <div className="flex min-w-0 items-center gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-indigo-50 text-xs font-semibold text-indigo-600 ring-1 ring-indigo-100">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-blue/10 text-xs font-semibold text-brand-cyan ring-1 ring-brand-blue/30">
           {student.register_number.slice(-2)}
         </span>
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-slate-800">{student.name}</p>
-          <p className="text-xs text-slate-500">
+          <p className="truncate text-sm font-medium text-brand-text">{student.name}</p>
+          <p className="text-xs text-brand-muted">
             {student.register_number} · Section {student.section_name}
           </p>
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-4">
         <div className="hidden w-28 sm:block">
-          <div className="mb-1 flex justify-between text-[11px] text-slate-500">
+          <div className="mb-1 flex justify-between text-[11px] text-brand-muted">
             <span>Score</span>
-            <span className="font-medium text-slate-700">{formatPercent(student.avg_percentage)}</span>
+            <span className="font-medium text-brand-text">{formatPercent(student.avg_percentage)}</span>
           </div>
           <ProgressBar
             value={student.avg_percentage}

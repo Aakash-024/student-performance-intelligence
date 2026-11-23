@@ -41,26 +41,26 @@ export default async function TermsPage() {
         bodyClassName="px-0 py-0"
       >
         {terms.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-slate-500">No terms yet. Add one above to get started.</p>
+          <p className="px-5 py-6 text-sm text-brand-muted">No terms yet. Add one above to get started.</p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-brand-border">
             {terms.map((term) => (
               <div key={term.id} className="px-5 py-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-slate-900">{term.name}</p>
+                      <p className="text-sm font-semibold text-brand-text">{term.name}</p>
                       {term.is_current ? (
-                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-400">
                           Current
                         </span>
                       ) : null}
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-brand-muted">
                       {term.year} · Semester {term.semester} · {formatDate(term.start_date)} – {formatDate(term.end_date)}
                     </p>
                   </div>
-                  <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
+                  <span className="rounded-full bg-brand-blue/10 px-2.5 py-1 text-xs font-medium text-brand-cyan">
                     Sem {term.semester}
                   </span>
                 </div>

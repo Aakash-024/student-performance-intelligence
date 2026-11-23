@@ -18,15 +18,15 @@ const ENTITY_TYPES = [
 ] as const;
 
 const changeTone: Record<string, string> = {
-  create: "bg-emerald-50 text-emerald-700",
-  session_create: "bg-emerald-50 text-emerald-700",
-  update: "bg-sky-50 text-sky-700",
-  save: "bg-sky-50 text-sky-700",
-  bulk: "bg-indigo-50 text-indigo-700",
-  import: "bg-indigo-50 text-indigo-700",
-  delete: "bg-rose-50 text-rose-700",
-  reset_password: "bg-amber-50 text-amber-700",
-  role_change: "bg-amber-50 text-amber-700",
+  create: "bg-emerald-500/10 text-emerald-400",
+  session_create: "bg-emerald-500/10 text-emerald-400",
+  update: "bg-sky-500/10 text-sky-400",
+  save: "bg-sky-500/10 text-sky-400",
+  bulk: "bg-brand-blue/10 text-brand-cyan",
+  import: "bg-brand-blue/10 text-brand-cyan",
+  delete: "bg-rose-500/10 text-rose-400",
+  reset_password: "bg-amber-500/10 text-amber-400",
+  role_change: "bg-amber-500/10 text-amber-400",
 };
 
 interface Entry {
@@ -80,11 +80,11 @@ export default async function ActivityPage({
       <Card bodyClassName="px-4 py-4 sm:px-5">
         <form method="get" className="flex flex-wrap items-end gap-3">
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium text-slate-500">Person</span>
+            <span className="mb-1 block text-xs font-medium text-brand-muted">Person</span>
             <select
               name="who"
               defaultValue={params.who ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">Everyone</option>
               {staffOptions.map((profile) => (
@@ -95,11 +95,11 @@ export default async function ActivityPage({
             </select>
           </label>
           <label className="text-sm">
-            <span className="mb-1 block text-xs font-medium text-slate-500">What</span>
+            <span className="mb-1 block text-xs font-medium text-brand-muted">What</span>
             <select
               name="type"
               defaultValue={params.type ?? ""}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400"
+              className="rounded-xl border border-brand-border bg-brand-navy px-3 py-2 text-sm text-brand-text outline-none focus:border-brand-cyan"
             >
               <option value="">Everything</option>
               {ENTITY_TYPES.map((type) => (
@@ -111,12 +111,12 @@ export default async function ActivityPage({
           </label>
           <button
             type="submit"
-            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+            className="rounded-xl bg-brand-blue px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
           >
             Apply
           </button>
           {params.who || params.type ? (
-            <a href="/activity" className="rounded-xl px-2 py-2 text-sm text-slate-500 hover:text-slate-800">
+            <a href="/activity" className="rounded-xl px-2 py-2 text-sm text-brand-muted hover:text-brand-text">
               Reset
             </a>
           ) : null}
@@ -130,12 +130,12 @@ export default async function ActivityPage({
         bodyClassName="px-0 py-0"
       >
         {rows.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-slate-500">
+          <p className="px-5 py-6 text-sm text-brand-muted">
             No activity matches this filter yet. Every create, edit, delete, mark save and CSV
             import will appear here.
           </p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-brand-border">
             {rows.map((entry) => {
               const change = entry.action.split(".")[1] ?? entry.action;
               return (
@@ -144,24 +144,24 @@ export default async function ActivityPage({
                     <span
                       className={cn(
                         "rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize",
-                        changeTone[change] ?? "bg-slate-100 text-slate-600",
+                        changeTone[change] ?? "bg-brand-navy-soft text-brand-muted",
                       )}
                     >
                       {change.replace("_", " ")}
                     </span>
-                    <p className="text-sm font-medium text-slate-800">{entry.entity_label}</p>
-                    <span className="text-xs text-slate-400">{when(entry.created_at)}</span>
+                    <p className="text-sm font-medium text-brand-text">{entry.entity_label}</p>
+                    <span className="text-xs text-brand-muted">{when(entry.created_at)}</span>
                   </div>
-                  <p className="mt-1 text-sm text-slate-600">{entry.summary}</p>
-                  <p className="mt-0.5 text-xs text-slate-400">
+                  <p className="mt-1 text-sm text-brand-muted">{entry.summary}</p>
+                  <p className="mt-0.5 text-xs text-brand-muted">
                     by {entry.actor_name} ({entry.actor_role})
                   </p>
                   {entry.details && Object.keys(entry.details).length ? (
                     <details className="mt-1.5">
-                      <summary className="cursor-pointer text-[11px] font-medium text-slate-400 hover:text-slate-600">
+                      <summary className="cursor-pointer text-[11px] font-medium text-brand-muted hover:text-brand-muted">
                         Details
                       </summary>
-                      <pre className="thin-scroll mt-1 max-h-48 overflow-auto rounded-lg bg-slate-50 px-3 py-2 text-[11px] text-slate-600">
+                      <pre className="thin-scroll mt-1 max-h-48 overflow-auto rounded-lg bg-brand-panel px-3 py-2 text-[11px] text-brand-muted">
                         {JSON.stringify(entry.details, null, 2)}
                       </pre>
                     </details>
@@ -172,7 +172,7 @@ export default async function ActivityPage({
           </div>
         )}
       </Card>
-      <p className="mt-3 text-xs text-slate-500">
+      <p className="mt-3 text-xs text-brand-muted">
         Showing up to 200 entries · mark-by-mark before/after values live on each assessment&apos;s
         &ldquo;Correction history&rdquo; card.
       </p>

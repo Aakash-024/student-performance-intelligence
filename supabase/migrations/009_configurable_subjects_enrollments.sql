@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 009: editable subjects and enrolments for staff
+-- ACADNEX Migration 009: editable subjects and enrolments for staff
 -- ============================================================================
 -- College regulations change year to year, so the teachers who run the
 -- platform must be able to rename subjects, change codes, and decide which

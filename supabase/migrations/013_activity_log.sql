@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 013: general activity log (who did what, when)
+-- ACADNEX Migration 013: general activity log (who did what, when)
 -- ============================================================================
 -- One append-only row per write action performed through the app: student,
 -- term, subject, enrolment, assessment, marks, attendance, CSV import and

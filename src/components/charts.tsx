@@ -23,22 +23,26 @@ import {
   YAxis,
 } from "recharts";
 
-const axis = { fontSize: 11, fill: "#64748b" };
-const grid = "#e2e8f0";
+const axis = { fontSize: 11, fill: "#94a3b8" };
+const grid = "#1c2740";
 
 const tooltipStyle = {
   borderRadius: 12,
-  border: "1px solid #e2e8f0",
-  boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
+  backgroundColor: "#0d1426",
+  border: "1px solid #1c2740",
+  color: "#f1f5f9",
+  boxShadow: "0 16px 40px rgba(2, 8, 23, 0.55)",
   fontSize: 12,
+  itemStyle: { color: "#f1f5f9" },
+  labelStyle: { color: "#94a3b8" },
 };
 
 export const CHART_COLORS = {
-  indigo: "#6366f1",
-  emerald: "#10b981",
+  indigo: "#2563eb",
+  emerald: "#22c55e",
   amber: "#f59e0b",
-  rose: "#f43f5e",
-  sky: "#0ea5e9",
+  rose: "#ef4444",
+  sky: "#22d3ee",
   slate: "#94a3b8",
 };
 
@@ -64,7 +68,7 @@ export function SubjectBarChart({
           contentStyle={tooltipStyle}
           formatter={(value, name) => [`${Number(value).toFixed(1)}%`, name]}
         />
-        <Legend wrapperStyle={{ fontSize: 12 }} />
+        <Legend wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
         <Bar dataKey="avg" name="Average" fill={CHART_COLORS.indigo} radius={[0, 6, 6, 0]} barSize={12} />
         <Bar dataKey="pass" name="Pass rate" fill={CHART_COLORS.emerald} radius={[0, 6, 6, 0]} barSize={12} />
       </BarChart>
@@ -87,7 +91,7 @@ export function IndicatorDonut({
           innerRadius={62}
           outerRadius={96}
           paddingAngle={3}
-          stroke="#fff"
+          stroke="#080d1b"
           strokeWidth={2}
         >
           {data.map((entry) => (
@@ -95,7 +99,7 @@ export function IndicatorDonut({
           ))}
         </Pie>
         <Tooltip contentStyle={tooltipStyle} />
-        <Legend wrapperStyle={{ fontSize: 12 }} />
+        <Legend wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
       </PieChart>
     </ResponsiveContainer>
   );
@@ -119,7 +123,7 @@ export function SectionComparisonChart({
           contentStyle={tooltipStyle}
           formatter={(value, name) => [`${Number(value).toFixed(1)}%`, name]}
         />
-        <Legend wrapperStyle={{ fontSize: 12 }} />
+        <Legend wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
         {terms.map((term, index) => (
           <Bar
             key={term}
@@ -149,7 +153,7 @@ export function TermTrendChart({
           contentStyle={tooltipStyle}
           formatter={(value, name) => [`${Number(value).toFixed(1)}%`, name]}
         />
-        <Legend wrapperStyle={{ fontSize: 12 }} />
+        <Legend wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
         <Line
           type="monotone"
           dataKey="avg"
@@ -190,7 +194,7 @@ export function ScoreDistributionChart({
             <Cell
               key={entry.band}
               fill={
-                ["#f43f5e", "#f59e0b", "#6366f1", "#0ea5e9", "#10b981"][index] ??
+                ["#ef4444", "#f59e0b", "#2563eb", "#22d3ee", "#22c55e"][index] ??
                 CHART_COLORS.indigo
               }
             />
@@ -209,9 +213,9 @@ export function SubjectRadarChart({
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RadarChart data={data} outerRadius={100}>
-        <PolarGrid stroke="#e2e8f0" />
-        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: "#475569" }} />
-        <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "#94a3b8" }} angle={90} />
+        <PolarGrid stroke="#1c2740" />
+        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11, fill: "#94a3b8" }} />
+        <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "#64748b" }} angle={90} />
         <Radar
           name="Current term"
           dataKey="current"
@@ -228,7 +232,7 @@ export function SubjectRadarChart({
           fillOpacity={0.08}
           strokeWidth={1.5}
         />
-        <Legend wrapperStyle={{ fontSize: 12 }} />
+        <Legend wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
         <Tooltip contentStyle={tooltipStyle} formatter={(value) => `${Number(value).toFixed(1)}%`} />
       </RadarChart>
     </ResponsiveContainer>

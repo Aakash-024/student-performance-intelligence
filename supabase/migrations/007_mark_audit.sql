@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 007: mark correction audit log
+-- ACADNEX Migration 007: mark correction audit log
 -- ============================================================================
 -- Records the before/after value of every existing mark that is changed.
 -- New marks (first entry) are not corrections, so they are not logged.

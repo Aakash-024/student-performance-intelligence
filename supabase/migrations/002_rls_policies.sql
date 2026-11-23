@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 002: Row Level Security Policies
+-- ACADNEX Migration 002: Row Level Security Policies
 -- Student Performance Intelligence Platform
 -- ============================================================================
 -- Enforces access control at the database level.

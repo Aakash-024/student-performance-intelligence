@@ -1,5 +1,5 @@
 """
-Data Validation Suite for SPIP Synthetic Dataset
+Data Validation Suite for ACADNEX Synthetic Dataset
 =================================================
 Validates integrity, foreign keys, boundaries, and logical consistency.
 
@@ -15,7 +15,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "generated")
 
 def run_validation():
     print("=" * 60)
-    print("Validating SPIP Synthetic Dataset...")
+    print("Validating ACADNEX Synthetic Dataset...")
     print("=" * 60)
 
     errors = []

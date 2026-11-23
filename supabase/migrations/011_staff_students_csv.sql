@@ -1,5 +1,5 @@
 -- ============================================================================
--- SPIP Migration 011: staff-managed students (CSV import support)
+-- ACADNEX Migration 011: staff-managed students (CSV import support)
 -- ============================================================================
 -- Teachers create and update student records from the Students page and from
 -- the CSV Import page. DELETE stays admin-only: removing a student still has

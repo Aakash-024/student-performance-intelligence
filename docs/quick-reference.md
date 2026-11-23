@@ -1,4 +1,4 @@
-# SPIP — Quick Reference (the 2-minute version)
+# ACADNEX — Quick Reference (the 2-minute version)
 
 Full explanations live in [`docs/ownership-guide.md`](ownership-guide.md). This is the card you
 keep open while working.

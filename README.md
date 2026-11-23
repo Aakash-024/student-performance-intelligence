@@ -1,13 +1,14 @@
-# Student Performance Intelligence Platform (SPIP)
+# ACADNEX — Academic Performance Intelligence Platform
 
-A full-stack academic analytics platform for engineering colleges. Administrators manage the
+A premium, dark-first academic analytics SaaS platform. Administrators manage the
 academic structure and staff; teachers enter marks and attendance for the classes assigned to them;
 everyone sees live, rule-based performance analytics and can download a professional PDF student
-report.
+report under the ACADNEX letterhead.
 
 > **New maintainer?** Start with [`docs/ownership-guide.md`](docs/ownership-guide.md) — a complete
 > beginner-friendly manual for this project: how it works, how to change it, how to deploy it.
 > In a hurry? [`docs/quick-reference.md`](docs/quick-reference.md) is the 2-minute version.
+> Brand rules (palette, logo, typography): [`docs/brand-guidelines.md`](docs/brand-guidelines.md).
 
 Built with **Next.js 16 (App Router)**, **TypeScript**, **Tailwind CSS**, **Supabase**
 (Postgres + Auth + Row Level Security) and **Recharts**.

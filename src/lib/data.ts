@@ -97,6 +97,36 @@ export async function getAssessmentSummaries(supabase: Client): Promise<Assessme
   return (data ?? []) as AssessmentSummary[];
 }
 
+export interface RecentActivityRow {
+  id: string;
+  created_at: string;
+  actor_name: string;
+  action: string;
+  entity_type: string;
+  entity_label: string;
+  summary: string;
+}
+
+/**
+ * Newest activity-log entries for dashboard "recent updates" surfaces.
+ * The activity_log table is append-only (migration 013) and readable by any
+ * signed-in staff member; viewers also have read access to keep the dashboard
+ * working in demo mode.
+ */
+export async function getRecentActivity(
+  supabase: Client,
+  limit = 8,
+): Promise<RecentActivityRow[]> {
+  const { data } = await supabase
+    .from("activity_log")
+    .select(
+      "id, created_at, actor_name, action, entity_type, entity_label, summary",
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as RecentActivityRow[];
+}
+
 export async function getMarkAudit(supabase: Client, assessmentId: string) {
   const { data } = await supabase
     .from("mark_audit")

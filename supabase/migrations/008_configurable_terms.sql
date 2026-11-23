@@ -1,9 +1,9 @@
 -- ============================================================================
--- SPIP Migration 008: configurable academic terms
+-- ACADNEX Migration 008: configurable academic terms
 -- ============================================================================
 -- The original schema capped semesters at 1 and 2. Colleges may run 6 or 8
 -- semesters, so widen the range to 1-8. Staff (teachers and admins) manage
--- terms directly in the app; only authenticated staff accounts exist in SPIP,
+-- terms directly in the app; only authenticated staff accounts exist in ACADNEX,
 -- so `TO authenticated` is the staff group.
 -- ============================================================================
 
