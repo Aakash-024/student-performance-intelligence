@@ -104,29 +104,15 @@ export default async function StudentDetailPage({
   const departmentCode = progressReportConfig.departmentCode || department?.code || "—";
   const departmentName = progressReportConfig.departmentName || department?.name || "—";
 
-  const currentTermMarks = marks.filter(
-    (mark) => mark.assessments?.academic_terms?.name === currentTerm?.name,
+  const cat1BySubject = new Map(
+    marks
+      .filter(
+        (mark) =>
+          mark.assessments?.type === "cat1" &&
+          mark.assessments.academic_terms?.name === currentTerm?.name,
+      )
+      .map((mark) => [mark.assessments!.subject_id, mark]),
   );
-  const marksByType = (type: string) =>
-    new Map(
-      currentTermMarks
-        .filter((mark) => mark.assessments?.type === type)
-        .map((mark) => [mark.assessments!.subject_id, mark]),
-    );
-  const cat1BySubject = marksByType("cat1");
-  const cat2BySubject = marksByType("cat2");
-  const semesterBySubject = marksByType("semester");
-
-  const examForReport = (
-    mark: (typeof currentTermMarks)[number] | undefined,
-  ) => {
-    if (!mark?.assessments) return null;
-    return {
-      marks: mark.is_absent ? null : Number(mark.marks_obtained),
-      maxMarks: Number(mark.assessments.max_marks),
-      absent: mark.is_absent,
-    };
-  };
 
   const mlFeatures = buildFeatures({
     overview,
@@ -143,7 +129,7 @@ export default async function StudentDetailPage({
     section: departmentCode === "—" ? (student.sections?.name ?? "—") : `${departmentCode}-${student.sections?.name ?? "—"}`,
     departmentName,
     departmentCode,
-    course: `${progressReportConfig.degree} (${departmentCode})`,
+    course: `B.TECH (${departmentCode})`,
     semester: currentTerm?.semester ?? 1,
     academicYear: currentTerm ? toAcademicYear(currentTerm.year) : "—",
     attendancePercent: overview?.attendance_percentage ?? 0,
@@ -151,12 +137,13 @@ export default async function StudentDetailPage({
     attendanceTo: formatDotDate(currentTerm?.end_date),
     subjects: currentSubjects.map((row) => {
       const subject = subjectById.get(row.subject_id);
+      const mark = cat1BySubject.get(row.subject_id);
       return {
         code: subject?.code ?? "—",
         name: subject?.name ?? "Subject",
-        cat1: examForReport(cat1BySubject.get(row.subject_id)),
-        cat2: examForReport(cat2BySubject.get(row.subject_id)),
-        semester: examForReport(semesterBySubject.get(row.subject_id)),
+        marks: mark && !mark.is_absent ? Number(mark.marks_obtained) : null,
+        maxMarks: mark?.assessments?.max_marks ?? 0,
+        absent: mark?.is_absent ?? false,
       };
     }),
     reportDate: formatDotDate(new Date().toISOString().slice(0, 10)),

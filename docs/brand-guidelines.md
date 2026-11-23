@@ -36,8 +36,12 @@ raw hex values in new UI.
 The mark is an ascending data progression: three bars of increasing height crossed
 by a rising line with a cyan endpoint. It expresses growth, analytics and forward
 motion without graduation-cap or brain clichés. In React, use `BrandMark` /
-`BrandLogo` from `src/components/brand.tsx` — the same geometry is drawn by
-`src/lib/progress-report.ts` for the PDF.
+`BrandLogo` from `src/components/brand.tsx`.
+
+**The downloadable progress-report PDF is intentionally NOT rebranded** — it keeps
+its original institutional letterhead and format (owner decision, November 2026).
+It lives in `src/lib/progress-report.ts` + `src/lib/report-config.ts`, and its
+letterhead text/logo are configured there, not by the brand system.
 
 **Clear space:** keep at least one icon-height of padding around the mark.
 **Minimum size:** 24 px for the icon, 120 px wide for the full wordmark.
